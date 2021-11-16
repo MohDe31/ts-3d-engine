@@ -1,0 +1,19 @@
+{
+    "name": "elements",
+    "version": "0.0.1",
+    "description": "A simulation of diffirent elements",
+    "main": "index.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "(mkdir compile || true) && rm -rf compile/* && tsc && cp -r src/assets compile/assets"
+    },
+    "author": "Bouderbala Mohammed Amine",
+    "license": "MIT",
+    "private": false,
+    "devDependencies": {
+        "@types/node": "^14.17.33",
+        "electron": "^16.0.0",
+        "uglifyify": "^5.0.2"
+    },
+    "dependencies": {}
+}
