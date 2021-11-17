@@ -58,7 +58,6 @@ export default class Mesh extends GameObject {
         const drawingTriangle: Array<Triangle> = new Array<Triangle>();
 
         // console.log(cameraForward);
-        
 
         for(let i = 0; i < this.triangles.length; i+=1) {
             triangle = this.triangles[i];
@@ -83,12 +82,14 @@ export default class Mesh extends GameObject {
 
             dProduct = vec3Dot(norm, cameraDiff);
             dDirection = vec3Dot(cameraDiff, cameraForward);
+            
+            triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.position)),
+                                     vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.position)),
+                                     vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.position)));
 
             if (dProduct < 0) {
 
-                triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.position)),
-                                         vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.position)),
-                                         vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.position)));
+
                 
                 triangle.normal = norm;
                 triangle.cameraPoints = [translated_1, translated_2, translated_3];

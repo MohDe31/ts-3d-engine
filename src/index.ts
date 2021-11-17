@@ -10,9 +10,10 @@ import Mesh from "./graphics/mesh";
 import { Triangle } from "./graphics/triangle";
 
 window.onload = function () {
-    const scene: Scene = new Scene();
-    const floor: Mesh = new Mesh();
-    const table: Mesh = parseObj(join(__dirname, "/assets/bill-table.obj"));
+    const scene : Scene = new Scene();
+    const floor : Mesh = new Mesh();
+    const table : Mesh = parseObj(join(__dirname, "/assets/bill-table.obj"));
+    const sphere: Mesh = new Sphere();
 
     const FLOORX: number = 25;
     const FLOORY: number = 25;
@@ -40,12 +41,17 @@ window.onload = function () {
     table.position.z = (FLOORY / 2) >> 0;
     table.position.y = 1;
 
-    scene.meshes.push(table);
-    scene.meshes.push(floor);
+    sphere.position.x = (FLOORX / 2) >> 0;
+    sphere.position.z = (FLOORY / 2) >> 0;
+    sphere.position.y = 1;
 
-    const rot: Vec3 = {x: Math.PI / 5, y: 0, z: 0}; 
+    scene.meshes.push(table );
+    scene.meshes.push(sphere);
+    scene.meshes.push(floor );
 
-    scene.camera = new Camera(scene, {x: (FLOORX / 2) >> 0, y: 3.5, z: ((FLOORY / 2) >> 0) - 4.5}, rot);
+    // const rot: Vec3 = {x: Math.PI / 5, y: 0, z: 0}; 
+
+    scene.camera = new Camera(scene)//, {x: ((FLOORX / 2) >> 0) - 4.5, y: 3.5, z: ((FLOORY / 2) >> 0) - 4.5});//, rot);
     scene.lights.push(new Light(.3, {x: 0,y: 1, z: 0}, {x: Math.PI / 2, y: 0, z: 0}));
 
     // scene.meshes.push(new Cube(8));

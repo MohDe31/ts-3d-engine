@@ -9,6 +9,12 @@ export type Vec3 = {
     z: number
 }
 
+export function vec3Set(v1: Vec3, v2: Vec3) {
+    v1.x = v2.x;
+    v1.y = v2.y;
+    v1.z = v2.z;
+}
+
 export function vec3xVec3Sub(v1: Vec3, v2: Vec3) {
     v1.x -= v2.x;
     v1.y -= v2.y;

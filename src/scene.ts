@@ -33,6 +33,9 @@ export default class Scene {
     drawScene(ctx, dt: number) {
         const keysIter = Keyboard.heldKeys.keys();
         
+        this.camera.calculateInverseCs();
+
+
         while(true) {
             const {value, done} = keysIter.next();
 
@@ -41,8 +44,8 @@ export default class Scene {
             switch(value){
                 case 'z': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.forward(), dt * 10));break;
                 case 's': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.forward(), -dt * 10));break;
-                case 'd': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.right(), dt * 10));break;
-                case 'q': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.right(), -dt * 10));break;
+                case 'd': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.localRight(), dt * 10));break;
+                case 'q': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.localRight(), -dt * 10));break;
                 
                 case ' '      : this.camera.position.y += dt * 10;break;
                 case 'Control': this.camera.position.y -= dt * 10;break;
@@ -57,8 +60,9 @@ export default class Scene {
             
         }
 
-
-        this.camera.calculateInverseCs();
+        
+        // this.camera.rotateAround({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0}, dt);
+        this.camera.lookAt({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0});
 
         this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
 
