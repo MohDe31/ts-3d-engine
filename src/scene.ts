@@ -1,5 +1,6 @@
 import { config } from "./config";
 import { Camera } from "./graphics/camera";
+import { Light } from "./graphics/light";
 import Mesh from "./graphics/mesh";
 import Renderer from "./renderer";
 import { Keyboard } from "./utils/keyboard";
@@ -12,6 +13,7 @@ export default class Scene {
 
     camera: Camera;
 
+    lights: Array<Light>;
     meshes: Array<Mesh>;
 
     constructor();
@@ -20,7 +22,7 @@ export default class Scene {
         this.world = world_s || config;
 
         this.meshes = new Array<Mesh>();
-        this.camera = new Camera(this, {x: 0, y: 0, z: -15});
+        this.lights = new Array<Light>();
 
         // this.elementIndexes = new Int32Array(((this.world.WIDTH * this.world.HEIGHT) / this.world.ELEMENT_SIZE) >> 0);
         // this.elementIndexes.fill(-1);
@@ -59,7 +61,7 @@ export default class Scene {
 
         this.camera.calculateInverseCs();
         for(let i = 0; i < this.meshes.length; i+=1) {
-            this.meshes[i].draw(ctx, this.camera);
+            this.meshes[i].draw(ctx, this.camera, this.lights);
         }
     }
 

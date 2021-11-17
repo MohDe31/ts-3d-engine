@@ -73,7 +73,7 @@ export default class ContextRenderer {
             this.others["fpsdiv"].innerHTML = this.time.fps;
         }
 
-        this.ctx.fillStyle = "BLACK";
+        this.ctx.fillStyle = "YELLOW";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         this.scene.drawScene(this.ctx, this.time.dt / 1000);

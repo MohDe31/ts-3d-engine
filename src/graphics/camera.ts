@@ -13,6 +13,7 @@ export class Camera extends GameObject {
 
     constructor(scene: Scene);
     constructor(scene: Scene, position: Vec3);
+    constructor(scene: Scene, position: Vec3, rotation: Vec3);
     constructor(scene: Scene, position?: Vec3, rotation?: Vec3) {
 
         super(position || {x: 0, y: 0, z: 0},
