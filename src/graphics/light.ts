@@ -10,7 +10,7 @@ export class Light extends GameObject {
     constructor(intensity: number, position: Vec3, rotation: Vec3) {
         super(position, rotation);
 
-        this.intensity = intensity;
+        this.intensity = Math.min(intensity || 1);
     }
 
 }

@@ -14,20 +14,12 @@ export default class GameObject {
 
     constructor(position: Vec3, rotation: Vec3)
     {
-        this.position = position;
-        this.rotation = rotation;
+        this.position = position || {x: 0, y: 0, z: 0};
+        this.rotation = rotation || {x: 0, y: 0, z: 0};
 
-        this.cos = {
-            x: 0,
-            y: 0,
-            z: 0
-        };;
+        this.cos = { x: 0, y: 0, z: 0 };
         
-        this.sin = {
-            x: 0,
-            y: 0,
-            z: 0
-        };
+        this.sin = { x: 0, y: 0, z: 0 };
     }
 
 

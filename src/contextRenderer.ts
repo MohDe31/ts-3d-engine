@@ -36,8 +36,6 @@ export default class ContextRenderer {
         this.canvas.style.transform = 'scale(1, -1)';
         // this.canvas.style.transform = 'rotate(180deg)';
         
-        console.log( this.canvas.style.transform);
-        
 
         if (this.rendererSettings?.showfps) {
             let container = this.canvas.parentElement;
@@ -92,7 +90,10 @@ export default class ContextRenderer {
             document.body.append(this.canvas);
         }
 
-        this.canvas.width = this.scene.world.WIDTH;
-        this.canvas.height = this.scene.world.HEIGHT;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+
+        this.scene.world.WIDTH = this.canvas.width;
+        this.scene.world.HEIGHT = this.canvas.height;
     }
 }

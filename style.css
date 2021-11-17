@@ -6,3 +6,9 @@
     font-size: x-large;
     color: green;
 }
+
+canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}

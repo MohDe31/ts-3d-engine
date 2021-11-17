@@ -1,5 +1,5 @@
 import { Color } from "../utils/color";
-import { Vec2, Vec3, vec3xNumDivR, vec3xVec3AddR } from "../utils/vecUtils";
+import { Vec3, vec3xNumDivR, vec3xVec3AddR } from "../utils/vecUtils";
 
 
 
@@ -10,6 +10,9 @@ export class Triangle {
     public avgZ: number;
     public material: Color;
 
+    public cameraPoints: Array<Vec3>;
+    public normal: Vec3;
+
     constructor(p1: Vec3, p2: Vec3, p3: Vec3);
     constructor(p1: Vec3, p2: Vec3, p3: Vec3, material: Color);
     constructor(p1?: Vec3, p2?: Vec3, p3?: Vec3, material?: Color) {
@@ -17,6 +20,10 @@ export class Triangle {
         this.avgZ = 0;
 
         this.material = material || {r: 255, g: 255, b: 255};
+
+
+        this.cameraPoints = new Array<Vec3>();
+        this.normal = {x: 0, y: 0, z: 0};
         
     }
 

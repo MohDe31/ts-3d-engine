@@ -1,5 +1,5 @@
 import { Color, HSVColor, hsvToRgb, rgbToHsv, rgbToString } from "../utils/color";
-import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3xNumDivR, vec3xVec3AddR, vec3xVec3SubR } from "../utils/vecUtils";
+import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3SqrMagnitude, vec3xNumDivR, vec3xVec3AddR, vec3xVec3SubR } from "../utils/vecUtils";
 import { Camera } from "./camera";
 import { rotateCs } from "./engine";
 import GameObject from "./gameobject";
@@ -13,7 +13,9 @@ export default class Mesh extends GameObject {
 
     public triangles: Array<Triangle>;
 
-    constructor(position: Vec3, rotation: Vec3) {
+    constructor();
+    constructor(position: Vec3, rotation: Vec3);
+    constructor(position?: Vec3, rotation?: Vec3) {
         super(position, rotation);
 
         this.triangles = new Array<Triangle>();
@@ -50,8 +52,13 @@ export default class Mesh extends GameObject {
 
         ctx.strokeStyle = "WHITE";
         
-        const cameraForward = camera.forward();
-        const lightNormalArr = lights.map(light => light.forward());
+        const cameraForward: Vec3 = camera.forward();
+        const lightNormalArr: Array<Vec3> = lights.map(light => light.forward());
+
+        const drawingTriangle: Array<Triangle> = new Array<Triangle>();
+
+        // console.log(cameraForward);
+        
 
         for(let i = 0; i < this.triangles.length; i+=1) {
             triangle = this.triangles[i];
@@ -64,9 +71,6 @@ export default class Mesh extends GameObject {
             translated_2 = vec3xVec3AddR(rotated_p2, this.position);
             translated_3 = vec3xVec3AddR(rotated_p3, this.position);
 
-
-            // triangle.avgZ = (translated_1[2] + translated_2[2] + translated_3[2]) / 3.0
-            
             center  = vec3xNumDivR(vec3xVec3AddR(vec3xVec3AddR(translated_1, translated_2), translated_3), 3);
             
             cameraDiff = vec3xVec3SubR(center, camera.position);
@@ -82,35 +86,49 @@ export default class Mesh extends GameObject {
 
             if (dProduct < 0) {
 
-                uv1 = camera.worldToScreenPoint(translated_1);
-                uv2 = camera.worldToScreenPoint(translated_2);
-                uv3 = camera.worldToScreenPoint(translated_3);
+                triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.position)),
+                                         vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.position)),
+                                         vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.position)));
+                
+                triangle.normal = norm;
+                triangle.cameraPoints = [translated_1, translated_2, translated_3];
 
-                lightIntensity = 0;
-
-                material = triangle.material;
-
-                hsvMaterial = rgbToHsv(material);
-    
-                for(let j = 0; j < lights.length; ++j)
-                {
-                    lightIntensity += this.getLightIntensity(vec3Normal(norm), lightNormalArr[j]);
-                }
-
-                hsvMaterial.v = lightIntensity;
-
-                material = hsvToRgb(hsvMaterial);
-
-                ctx.fillStyle = rgbToString(material);
-
-                ctx.beginPath();
-                ctx.moveTo(uv1.x, uv1.y);
-                ctx.lineTo(uv2.x, uv2.y);
-                ctx.lineTo(uv3.x, uv3.y);
-                ctx.lineTo(uv1.x, uv1.y);
-                ctx.fill();
+                drawingTriangle.push(triangle);
             }
-            
+        }
+
+        drawingTriangle.sort((a, b) => b.avgZ - a.avgZ);
+
+        for(let i = 0; i < drawingTriangle.length; i+=1) {
+            triangle = drawingTriangle[i];
+
+            uv1 = camera.worldToScreenPoint(triangle.cameraPoints[0]);
+            uv2 = camera.worldToScreenPoint(triangle.cameraPoints[1]);
+            uv3 = camera.worldToScreenPoint(triangle.cameraPoints[2]);
+
+            lightIntensity = 0;
+
+            material = triangle.material;
+
+            hsvMaterial = rgbToHsv(material);
+
+            for(let j = 0; j < lights.length; ++j)
+            {
+                lightIntensity += this.getLightIntensity(vec3Normal(triangle.normal), lightNormalArr[j]) * lights[j].intensity;
+            }
+
+            hsvMaterial.v = Math.min(lightIntensity + hsvMaterial.v, 1);
+
+            material = hsvToRgb(hsvMaterial);
+
+            ctx.fillStyle = rgbToString(material);
+
+            ctx.beginPath();
+            ctx.moveTo(uv1.x, uv1.y);
+            ctx.lineTo(uv2.x, uv2.y);
+            ctx.lineTo(uv3.x, uv3.y);
+            ctx.lineTo(uv1.x, uv1.y);
+            ctx.fill();
 
         }
     }

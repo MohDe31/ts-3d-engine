@@ -2,7 +2,6 @@ import { config } from "./config";
 import { Camera } from "./graphics/camera";
 import { Light } from "./graphics/light";
 import Mesh from "./graphics/mesh";
-import Renderer from "./renderer";
 import { Keyboard } from "./utils/keyboard";
 import { vec3xNumMulR, vec3xVec3Add } from "./utils/vecUtils";
 
@@ -38,7 +37,7 @@ export default class Scene {
             const {value, done} = keysIter.next();
 
             if(done) break;
-
+            
             switch(value){
                 case 'z': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.forward(), dt * 10));break;
                 case 's': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.forward(), -dt * 10));break;
@@ -60,10 +59,15 @@ export default class Scene {
 
 
         this.camera.calculateInverseCs();
+
+        this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
+
         for(let i = 0; i < this.meshes.length; i+=1) {
             this.meshes[i].draw(ctx, this.camera, this.lights);
         }
     }
+
+    /*
 
     onMouseDrag(...args) {
         const e: MouseEvent = args[0];
@@ -76,6 +80,8 @@ export default class Scene {
         let position = {x: x, y: y};
         //position.__fix(this.world.ELEMENT_SIZE);
     }
+
+    */
 
     keyHandler(e: KeyboardEvent, key) {
         
