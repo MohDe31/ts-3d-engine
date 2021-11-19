@@ -7,8 +7,6 @@ import { Light } from "./light";
 import { Triangle } from "./triangle";
 
 
-
-
 export default class Mesh extends GameObject {
 
     public triangles: Array<Triangle>;
@@ -43,7 +41,6 @@ export default class Mesh extends GameObject {
         let v21: Vec3, v31: Vec3;
         let norm: Vec3;
         let dProduct: number;
-        let dDirection: number;
 
         let material: Color;
         let hsvMaterial: HSVColor;
@@ -81,15 +78,12 @@ export default class Mesh extends GameObject {
             norm = vec3Cross(v21, v31);
 
             dProduct = vec3Dot(norm, cameraDiff);
-            dDirection = vec3Dot(cameraDiff, cameraForward);
             
             triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.position)),
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.position)),
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.position)));
 
             if (dProduct < 0) {
-
-
                 
                 triangle.normal = norm;
                 triangle.cameraPoints = [translated_1, translated_2, translated_3];
@@ -118,11 +112,17 @@ export default class Mesh extends GameObject {
                 lightIntensity += this.getLightIntensity(vec3Normal(triangle.normal), lightNormalArr[j]) * lights[j].intensity;
             }
 
-            hsvMaterial.v = Math.min(lightIntensity + hsvMaterial.v, 1);
+            hsvMaterial.v = hsvMaterial.v * Math.min(lightIntensity, 1);
+            
 
             material = hsvToRgb(hsvMaterial);
 
+
+            
+
+
             ctx.fillStyle = rgbToString(material);
+            // ctx.strokeStyle = rgbToString(material);
 
             ctx.beginPath();
             ctx.moveTo(uv1.x, uv1.y);
@@ -130,6 +130,7 @@ export default class Mesh extends GameObject {
             ctx.lineTo(uv3.x, uv3.y);
             ctx.lineTo(uv1.x, uv1.y);
             ctx.fill();
+            // ctx.stroke();
 
         }
     }

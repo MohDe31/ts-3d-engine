@@ -4,8 +4,6 @@ import { Vec3, Vec2, vec3xVec3SubR } from "../utils/vecUtils";
 import { rotateCs } from "./engine";
 import GameObject from "./gameobject";
 
-
-
 export class Camera extends GameObject {
 
     scene: Scene;

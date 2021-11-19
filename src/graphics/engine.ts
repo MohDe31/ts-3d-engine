@@ -1,12 +1,6 @@
 import { Vec3 } from "../utils/vecUtils";
 
 
-
-
-
-
-
-
 export function rotate(point: Vec3, rotation: Vec3): Vec3 {
     let cos: Vec3 = {
         x: Math.cos(rotation.x),

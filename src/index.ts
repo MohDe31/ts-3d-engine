@@ -5,19 +5,26 @@ import { parseObj } from "./utils/objParser";
 import { join } from "path";
 import { Light } from "./graphics/light";
 import { Camera } from "./graphics/camera";
-import { Vec3 } from "./utils/vecUtils";
 import Mesh from "./graphics/mesh";
 import { Triangle } from "./graphics/triangle";
+import { Vec3 } from "./utils/vecUtils";
 
 window.onload = function () {
     const scene : Scene = new Scene();
     const floor : Mesh = new Mesh();
     const table : Mesh = parseObj(join(__dirname, "/assets/bill-table.obj"));
-    const sphere: Mesh = new Sphere();
+    const sphere: Mesh = new Sphere(8);
 
     const FLOORX: number = 25;
     const FLOORY: number = 25;
 
+    sphere.triangles.forEach(tri=>{
+        tri.material = {
+            r: 0,
+            g: 155,
+            b: 0
+        }
+    })
 
 
     for(let i = 0; i < FLOORX; i+=1)
@@ -43,16 +50,16 @@ window.onload = function () {
 
     sphere.position.x = (FLOORX / 2) >> 0;
     sphere.position.z = (FLOORY / 2) >> 0;
-    sphere.position.y = 1;
+    sphere.position.y = 9;
 
     scene.meshes.push(table );
     scene.meshes.push(sphere);
     scene.meshes.push(floor );
 
-    // const rot: Vec3 = {x: Math.PI / 5, y: 0, z: 0}; 
+    const rot: Vec3 = {x: Math.PI / 5, y: 0, z: 0}; 
 
-    scene.camera = new Camera(scene)//, {x: ((FLOORX / 2) >> 0) - 4.5, y: 3.5, z: ((FLOORY / 2) >> 0) - 4.5});//, rot);
-    scene.lights.push(new Light(.3, {x: 0,y: 1, z: 0}, {x: Math.PI / 2, y: 0, z: 0}));
+    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0) - 4.5, y: 3.5, z: ((FLOORY / 2) >> 0) - 4.5}, rot);
+    scene.lights.push(new Light(1, {x: 0,y: 1, z: 0}, rot));//{x: Math.PI / 2, y: 0, z: 0}));
 
     // scene.meshes.push(new Cube(8));
     // scene.meshes.push(new Sphere(8, {x: 5, y: 0, z: 0}));

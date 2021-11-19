@@ -24,7 +24,7 @@ export function parseMat(path: string): MaterialStore {
             }else if(line.startsWith("Kd ")) {
                 const [r, g, b] = line.substr(3).split(" ").map(parseFloat);
 
-                matStore.set(matName, { r: r, g: g, b: b });
+                matStore.set(matName, { r: r * 255, g: g * 255, b: b * 255 });
             }
 
         });

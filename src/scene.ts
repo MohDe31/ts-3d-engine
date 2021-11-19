@@ -23,9 +23,6 @@ export default class Scene {
         this.meshes = new Array<Mesh>();
         this.lights = new Array<Light>();
 
-        // this.elementIndexes = new Int32Array(((this.world.WIDTH * this.world.HEIGHT) / this.world.ELEMENT_SIZE) >> 0);
-        // this.elementIndexes.fill(-1);
-
         this.selectedElementIdx = 0;
     }
     
@@ -62,7 +59,7 @@ export default class Scene {
 
         
         // this.camera.rotateAround({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0}, dt);
-        this.camera.lookAt({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0});
+        // this.camera.lookAt({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0});
 
         this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
 
@@ -71,31 +68,9 @@ export default class Scene {
         }
     }
 
-    /*
-
-    onMouseDrag(...args) {
-        const e: MouseEvent = args[0];
-
-        const rect = Renderer.instance.getBoundRect();
-
-        const x = (e.clientX - rect.x) >> 0;
-        const y = (e.clientY - rect.y) >> 0;
-
-        let position = {x: x, y: y};
-        //position.__fix(this.world.ELEMENT_SIZE);
-    }
-
-    */
-
     keyHandler(e: KeyboardEvent, key) {
         
         if(e.type == "keydown") Keyboard.addKey(key);
         else if(e.type == "keyup") Keyboard.removeKey(key);
-        
-        // TODO: Handle keys
-    }
-
-    pointToIdx(x: number, y: number) {
-        return (((y / this.world.ELEMENT_SIZE) * this.world.WIDTH + x) / this.world.ELEMENT_SIZE) >> 0;
     }
 }
