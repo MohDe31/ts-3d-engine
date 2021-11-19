@@ -1,5 +1,5 @@
+import setDraggable from "./common/draggable";
 import Time from "./common/time";
-import { Triangle } from "./graphics/triangle";
 import Scene from "./scene";
 import { FRAGMENT_SHADER } from "./shaders/fragmentshader";
 import { VERTEX_SHADER } from "./shaders/vertexshader";
@@ -21,19 +21,19 @@ export default class Renderer {
     fragmentShader: WebGLShader;
 
     positionBuffer: WebGLBuffer;
+    rotationBuffer: WebGLBuffer;
+    normalBuffer: WebGLBuffer;
+    vertexBuffer: WebGLBuffer;
     colorBuffer: WebGLBuffer;
-    // rotationBuffer: WebGLBuffer;
-    // normalBuffer: WebGLBuffer;
-    // vertexBuffer: WebGLBuffer;
 
     camPositionUniformLocation: WebGLUniformLocation;
     camRotationUniformLocation: WebGLUniformLocation;
 
     positionGrid: Float32Array;
+    rotationGrid: Float32Array;
+    normalGrid: Float32Array;
+    vertexGrid: Float32Array;
     colorGrid: Float32Array;
-    // rotationGrid: Float32Array;
-    // normalGrid: Float32Array;
-    // vertexGrid: Float32Array;
 
     scene: Scene;
     time: Time;
@@ -71,12 +71,12 @@ export default class Renderer {
         }
 
         const points = this.scene.meshes.map((mesh) => mesh.triangles.length).reduce((a,b) => a+b) * 9;
-        
+
         this.positionGrid = new Float32Array(points);
+        this.rotationGrid = new Float32Array(points);
+        this.normalGrid = new Float32Array(points);
+        this.vertexGrid = new Float32Array(points);
         this.colorGrid = new Float32Array(points);
-        // this.rotationGrid = new Float32Array(points);
-        // this.normalGrid = new Float32Array(points);
-        // this.vertexGrid = new Float32Array(points);
 
         this.setupWebGL();
 
@@ -118,16 +118,14 @@ export default class Renderer {
         let i = 0;
 
         const position_array = [];
+        const rotation_array = [];
+        const normal_array = [];
+        const points_array = [];
         const colors_array = [];
-
-        // const rotation_array = [];
-        // const normal_array = [];
-        // const points_array = [];
 
         let rgb_normal: Color;
         const self = this;
-        let tri: Triangle;
-
+        
         this.gl.uniform3f(this.camPositionUniformLocation, 
                 this.scene.camera.position.x,
                 this.scene.camera.position.y,
@@ -138,30 +136,28 @@ export default class Renderer {
                 this.scene.camera.rotation.y,
                 this.scene.camera.rotation.z);
 
-        this.scene.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
+
+        this.scene.meshes.sort((a, b) => a.getAvgZ() - b.getAvgZ());
+
         this.scene.meshes.forEach((mesh) => {
-            mesh.update(this.scene.camera, this.scene.lights);
-
-            mesh.visibleTriangles.forEach(j=>{
-                tri = mesh.triangles[j];
-
-                tri.camPosition.forEach(pt => {
+            mesh.triangles.forEach(tri=>{
+                tri.points.forEach(pt => {
                     ++i;
-                    rgb_normal = rgbNormal(tri.afterLightMaterial);
+                    rgb_normal = rgbNormal(tri.material);
 
-                    position_array.push(pt.x, pt.y, pt.z);
+                    position_array.push(mesh.position.x, mesh.position.y, mesh.position.z);
+                    rotation_array.push(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
                     colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b);
+                    points_array.push(pt.x, pt.y, pt.z);
                 })
             });
         });
         
-        
-
         this.updateBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer, new Float32Array(position_array));
+        this.updateBuffer(this.gl.ARRAY_BUFFER, this.rotationBuffer, new Float32Array(rotation_array));
+        this.updateBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer, new Float32Array(points_array));
         this.updateBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer, new Float32Array(colors_array));
-        // this.updateBuffer(this.gl.ARRAY_BUFFER, this.rotationBuffer, new Float32Array(rotation_array));
-        // this.updateBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer, new Float32Array(points_array));
-        
+
         this.gl.drawArrays(this.gl.TRIANGLES, 0, i);
 
         requestAnimationFrame(() => {
@@ -237,21 +233,22 @@ export default class Renderer {
 
             this.webglProgram = this.createProgram(this.vertexShader, this.fragmentShader);
 
+            // TODO: DYNAMIC_DRAW
             this.positionBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.positionGrid, this.gl.STATIC_DRAW, "a_position", 3, this.gl.FLOAT);
+            this.rotationBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.rotationGrid, this.gl.STATIC_DRAW, "a_rotation", 3, this.gl.FLOAT);
+            this.normalBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.normalGrid, this.gl.STATIC_DRAW, "a_normal", 3, this.gl.FLOAT);
+            this.vertexBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.vertexGrid, this.gl.STATIC_DRAW, "a_point", 3, this.gl.FLOAT);
             this.colorBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.colorGrid, this.gl.STATIC_DRAW, "a_color", 3, this.gl.FLOAT);
-            
-            // this.rotationBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.rotationGrid, this.gl.STATIC_DRAW, "a_rotation", 3, this.gl.FLOAT);
-            // this.normalBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.normalGrid, this.gl.STATIC_DRAW, "a_normal", 3, this.gl.FLOAT);
-            // this.vertexBuffer = this.createBuffer(this.gl.ARRAY_BUFFER, this.vertexGrid, this.gl.STATIC_DRAW, "a_point", 3, this.gl.FLOAT);
-            
+
             this.camPositionUniformLocation = this.gl.getUniformLocation(this.webglProgram, "u_camPosition");
             this.camRotationUniformLocation = this.gl.getUniformLocation(this.webglProgram, "u_camRotation");
             
             let widthHeightUniformLocation = this.gl.getUniformLocation(this.webglProgram, "u_size");
+            let lightUniformLocation = this.gl.getUniformLocation(this.webglProgram, "u_lightNormal");
             let fovUniformLocation = this.gl.getUniformLocation(this.webglProgram, "u_f");
 
             const lightForward = this.scene.lights[0].forward();
-            
+            this.gl.uniform3f(lightUniformLocation, lightForward.x, lightForward.y, lightForward.z);
             this.gl.uniform2f(widthHeightUniformLocation, this.canvas.width, this.canvas.height);
             this.gl.uniform1f(fovUniformLocation, this.scene.camera.config.F)
         } catch (e) {

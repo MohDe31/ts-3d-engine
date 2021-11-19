@@ -119,7 +119,6 @@ export default class Mesh extends GameObject {
                 material = hsvToRgb(hsvMaterial);
 
                 triangle.afterLightMaterial = material;
-
             }
         }
 

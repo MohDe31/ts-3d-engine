@@ -13,9 +13,11 @@ export class Cube extends Mesh {
 
         let step = 1 / resolution;
 
+        const triangles = [];
+
         for(let i = 0; i < resolution; i+=1)
         for(let j = 0; j < resolution; j+=1) {
-            this.triangles.push(
+            triangles.push(
                 //TOP
                 new Triangle({x: step * i, y: 1, z: step * j}, {x: step * i, y: 1, z: step + step * j}, {x: step + step * i, y: 1, z: step * j}),
                 new Triangle({x: step * i, y: 1, z: step + step * j}, {x: step + step * i, y: 1, z: step + step * j}, {x: step + step * i, y: 1, z: step * j}),
@@ -36,6 +38,8 @@ export class Cube extends Mesh {
                 new Triangle({x: step * i, y: step + step * j, z: 0}, {x: step + step * i, y: step + step * j, z: 0}, {x: step + step * i, y: step * j, z: 0}), 
             );
         }
+
+        this.setTriangles(triangles);
 
 
 

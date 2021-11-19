@@ -3,10 +3,11 @@ export const VERTEX_SHADER: string = `
 precision mediump float;
 
 attribute vec3 a_position;
+attribute vec3 a_point;
+attribute vec3 a_rotation;
 attribute vec3 a_color;
 
 uniform vec2 u_size;
-
 uniform vec3 u_camPosition;
 uniform vec3 u_camRotation;
 
@@ -28,8 +29,17 @@ vec3 rotate(vec3 point, vec3 rotation)
     return result;
 }
 
+vec3 meshTransformation()
+{
+    vec3 result = rotate(a_point, a_rotation);
+    result = result + a_position;
+
+
+    return result;
+}
+
 void main(void){
-    vec3 meshPosition = a_position;
+    vec3 meshPosition = meshTransformation();
 
     vec3 camTranslatedPoint = rotate(meshPosition - u_camPosition, -u_camRotation);
     
