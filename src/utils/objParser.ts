@@ -92,7 +92,7 @@ export function parseObj(path: string): Mesh {
 
 
         const out: Mesh = new Mesh({x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 0});
-        out.triangles = triangles;
+        out.setTriangles(triangles);
 
         console.log(out);
         

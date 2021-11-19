@@ -27,11 +27,8 @@ export default class Scene {
     }
     
 
-    drawScene(ctx, dt: number) {
+    updateScene(dt: number) {
         const keysIter = Keyboard.heldKeys.keys();
-        
-        this.camera.calculateInverseCs();
-
 
         while(true) {
             const {value, done} = keysIter.next();
@@ -52,19 +49,7 @@ export default class Scene {
                 case 'ArrowLeft': this.camera.rotation.y -= dt;break;
                 case 'ArrowRight': this.camera.rotation.y += dt;break;
             }
-
-            // console.log(value);
             
-        }
-
-        
-        // this.camera.rotateAround({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0}, dt);
-        // this.camera.lookAt({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0});
-
-        this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
-
-        for(let i = 0; i < this.meshes.length; i+=1) {
-            this.meshes[i].draw(ctx, this.camera, this.lights);
         }
     }
 

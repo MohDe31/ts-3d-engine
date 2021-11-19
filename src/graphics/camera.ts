@@ -23,8 +23,8 @@ export class Camera extends GameObject {
 
     getCenterUV(): Vec2 {
         return {
-            x: (this.scene.world.WIDTH / 2) >> 0,
-            y: (this.scene.world.HEIGHT / 2) >> 0
+            x: (this.scene.world.WIDTH >> 1),
+            y: (this.scene.world.HEIGHT >> 1)
         };    
     }
 
@@ -41,8 +41,8 @@ export class Camera extends GameObject {
         let yz = camPoints.y / camPoints.z;
 
         return {
-            x: this.config.F * this.config.ALPHA * xz + x,
-            y: this.config.F * this.config.BETA * yz + y
+            x: this.config.ALPHA * xz,
+            y: this.config.BETA * yz
         }
     }
 

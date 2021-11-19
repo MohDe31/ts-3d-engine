@@ -37,6 +37,8 @@ export class Cube extends Mesh {
             );
         }
 
+
+
         for(let i = 0; i < this.triangles.length; i+=1) {
             vec3xVec3Sub(this.triangles[i].points[0], {x: .5, y: .5, z: .5});
             vec3xVec3Sub(this.triangles[i].points[1], {x: .5, y: .5, z: .5});

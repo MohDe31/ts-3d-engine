@@ -9,14 +9,28 @@ import { Triangle } from "./triangle";
 
 export default class Mesh extends GameObject {
 
-    public triangles: Array<Triangle>;
+    private triangles_: Array<Triangle>;
+    
+    public visibleTriangles: Array<number>;
+    public visibleTrianglesCount: number;
 
     constructor();
     constructor(position: Vec3, rotation: Vec3);
     constructor(position?: Vec3, rotation?: Vec3) {
         super(position, rotation);
 
-        this.triangles = new Array<Triangle>();
+        this.visibleTrianglesCount = 0;
+        this.triangles_ = new Array<Triangle>();
+    }
+
+    setTriangles(triangles: Array<Triangle>) {
+        this.triangles_ = triangles;
+
+        this.visibleTriangles = new Array<number>(triangles.length);
+    }
+
+    get triangles() {
+        return this.triangles_;
     }
 
     getAvgZ(): number {
@@ -29,11 +43,11 @@ export default class Mesh extends GameObject {
         return dotProduct >= 0 ? 0 : -dotProduct;
     }
 
-    draw(ctx: CanvasRenderingContext2D, camera: Camera, lights: Array<Light>) {
+    update(camera: Camera, lights: Array<Light>) {
+        this.visibleTrianglesCount = 0;
         this.calculateCs();
 
         let triangle: Triangle;
-        let uv1: Vec2, uv2: Vec2, uv3: Vec2;
         let rotated_p1: Vec3, rotated_p2: Vec3, rotated_p3: Vec3;
         let translated_1: Vec3, translated_2: Vec3, translated_3: Vec3;
         let center: Vec3;
@@ -46,18 +60,14 @@ export default class Mesh extends GameObject {
         let hsvMaterial: HSVColor;
 
         let lightIntensity: number;
-
-        ctx.strokeStyle = "WHITE";
         
-        const cameraForward: Vec3 = camera.forward();
         const lightNormalArr: Array<Vec3> = lights.map(light => light.forward());
 
-        const drawingTriangle: Array<Triangle> = new Array<Triangle>();
-
-        // console.log(cameraForward);
+        this.visibleTrianglesCount = 0;
 
         for(let i = 0; i < this.triangles.length; i+=1) {
-            triangle = this.triangles[i];
+            triangle = this.triangles_[i];
+
 
             rotated_p1 = rotateCs(triangle.points[0], this.cos, this.sin);
             rotated_p2 = rotateCs(triangle.points[1], this.cos, this.sin);
@@ -67,10 +77,11 @@ export default class Mesh extends GameObject {
             translated_2 = vec3xVec3AddR(rotated_p2, this.position);
             translated_3 = vec3xVec3AddR(rotated_p3, this.position);
 
+            triangle.camPosition = [translated_1, translated_2, translated_3];
+
             center  = vec3xNumDivR(vec3xVec3AddR(vec3xVec3AddR(translated_1, translated_2), translated_3), 3);
             
             cameraDiff = vec3xVec3SubR(center, camera.position);
-
 
             v21 = vec3xVec3SubR(translated_2, translated_1);
             v31 = vec3xVec3SubR(translated_3, translated_1);
@@ -84,54 +95,34 @@ export default class Mesh extends GameObject {
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.position)));
 
             if (dProduct < 0) {
+
+                this.visibleTriangles[this.visibleTrianglesCount++] = i;
                 
                 triangle.normal = norm;
                 triangle.cameraPoints = [translated_1, translated_2, translated_3];
 
-                drawingTriangle.push(triangle);
+
+                lightIntensity = 0;
+
+                material = triangle.material;
+    
+                hsvMaterial = rgbToHsv(material);
+    
+                for(let j = 0; j < lights.length; ++j)
+                {
+                    lightIntensity += this.getLightIntensity(vec3Normal(triangle.normal), lightNormalArr[j]) * lights[j].intensity;
+                }
+    
+                hsvMaterial.v = hsvMaterial.v * Math.min(lightIntensity, 1);
+                
+    
+                material = hsvToRgb(hsvMaterial);
+
+                triangle.afterLightMaterial = material;
+
             }
         }
 
-        drawingTriangle.sort((a, b) => b.avgZ - a.avgZ);
-
-        for(let i = 0; i < drawingTriangle.length; i+=1) {
-            triangle = drawingTriangle[i];
-
-            uv1 = camera.worldToScreenPoint(triangle.cameraPoints[0]);
-            uv2 = camera.worldToScreenPoint(triangle.cameraPoints[1]);
-            uv3 = camera.worldToScreenPoint(triangle.cameraPoints[2]);
-
-            lightIntensity = 0;
-
-            material = triangle.material;
-
-            hsvMaterial = rgbToHsv(material);
-
-            for(let j = 0; j < lights.length; ++j)
-            {
-                lightIntensity += this.getLightIntensity(vec3Normal(triangle.normal), lightNormalArr[j]) * lights[j].intensity;
-            }
-
-            hsvMaterial.v = hsvMaterial.v * Math.min(lightIntensity, 1);
-            
-
-            material = hsvToRgb(hsvMaterial);
-
-
-            
-
-
-            ctx.fillStyle = rgbToString(material);
-            // ctx.strokeStyle = rgbToString(material);
-
-            ctx.beginPath();
-            ctx.moveTo(uv1.x, uv1.y);
-            ctx.lineTo(uv2.x, uv2.y);
-            ctx.lineTo(uv3.x, uv3.y);
-            ctx.lineTo(uv1.x, uv1.y);
-            ctx.fill();
-            // ctx.stroke();
-
-        }
+        this.visibleTriangles.sort((a, b) => this.triangles_[b].avgZ - this.triangles_[a].avgZ);
     }
 }
