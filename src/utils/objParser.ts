@@ -31,7 +31,7 @@ export function parseMat(path: string): MaterialStore {
 
         return matStore;
     }catch(error){
-        console.log(error);
+        console.error(error);
         return undefined;
     }
 }
@@ -84,6 +84,8 @@ export function parseObj(path: string): Mesh {
 
                 matPath = join(baseDir, matFileName);
 
+                console.log(path);
+                
                 matStore = parseMat(matPath);
             }else if(line.startsWith("usemtl") && matStore != undefined){
                 matName = line.split(" ")[1];

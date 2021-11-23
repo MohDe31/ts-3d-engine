@@ -122,7 +122,7 @@ export default class Mesh extends GameObject {
 
 
             ctx.fillStyle = rgbToString(material);
-            // ctx.strokeStyle = rgbToString(material);
+            ctx.strokeStyle = rgbToString(material);
 
             ctx.beginPath();
             ctx.moveTo(uv1.x, uv1.y);
@@ -130,6 +130,8 @@ export default class Mesh extends GameObject {
             ctx.lineTo(uv3.x, uv3.y);
             ctx.lineTo(uv1.x, uv1.y);
             ctx.fill();
+
+            ctx.stroke();
             // ctx.stroke();
 
         }
