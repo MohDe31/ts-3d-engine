@@ -1,5 +1,6 @@
 
 
+// A static class to get, store, remove key strokes
 export class Keyboard {
     static heldKeys: Map<string, undefined> = new Map<string, undefined>();
     

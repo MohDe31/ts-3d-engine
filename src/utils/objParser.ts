@@ -1,11 +1,12 @@
 import { readFileSync } from 'fs';
 import {parse, join} from "path";
 
-import { Triangle } from '../graphics/triangle';
+import { Triangle } from '../core/triangle';
 import { Vec3 } from './vecUtils';
-import Mesh from "../graphics/mesh";
+import Mesh from "../core/mesh";
 import { MaterialStore } from './material';
 import { Color } from './color';
+import GameObject from '../core/gameobject';
 
 
 export function parseMat(path: string): MaterialStore {
@@ -36,7 +37,7 @@ export function parseMat(path: string): MaterialStore {
     }
 }
 
-export function parseObj(path: string): Mesh {
+export function parseObj(path: string): GameObject {
 
     try {
         const content: string = readFileSync(path).toString();
@@ -93,11 +94,10 @@ export function parseObj(path: string): Mesh {
         });
 
 
-        const out: Mesh = new Mesh({x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 0});
-        out.triangles = triangles;
-
-        console.log(out);
+        const out: GameObject = new GameObject({x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 0});
+        const mesh: Mesh = out.addComponent(Mesh) as Mesh;
         
+        mesh.triangles = triangles;
         
         return out;
         

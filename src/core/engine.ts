@@ -18,6 +18,7 @@ export function rotate(point: Vec3, rotation: Vec3): Vec3 {
 }
 
 
+// Based on https://en.wikipedia.org/wiki/Rotation_matrix#General_rotations
 export function rotateCs(point: Vec3, cos: Vec3, sin: Vec3): Vec3 {
     return {
         x: point.x * (cos.z*cos.y-sin.x*sin.y*sin.z) - point.y * sin.z * cos.x + point.z * (cos.z*sin.y+sin.x*sin.z*cos.y),

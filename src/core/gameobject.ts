@@ -1,7 +1,7 @@
-import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3Set, vec3SqrMagnitude, vec3xVec3Add, vec3xVec3AddR, vec3xVec3Sub, vec3xVec3SubR } from "../utils/vecUtils";
+import { Vec3, vec3Set, vec3xVec3AddR, vec3xVec3SubR } from "../utils/vecUtils";
+import { Component } from "./component";
 import { rotate } from "./engine";
-
-
+import { RigidBody2D } from "./rigidbody";
 
 
 export default class GameObject {
@@ -12,7 +12,10 @@ export default class GameObject {
     public cos: Vec3;
     public sin: Vec3;
 
-    constructor(position: Vec3, rotation: Vec3)
+    private components: Array<Component>;
+    private parent2D: Vec3;
+
+    constructor(position?: Vec3, rotation?: Vec3)
     {
         this.position = position || {x: 0, y: 0, z: 0};
         this.rotation = rotation || {x: 0, y: 0, z: 0};
@@ -20,6 +23,42 @@ export default class GameObject {
         this.cos = { x: 0, y: 0, z: 0 };
         
         this.sin = { x: 0, y: 0, z: 0 };
+
+        this.components = new Array<Component>();
+    }
+
+    update(dt: number){
+        if(this.parent2D){
+            this.position.x = this.parent2D.x;
+            this.position.y = this.parent2D.z;
+            this.position.z = this.parent2D.y;
+        }
+        // TODO: Change this to a for loop
+        this.components.forEach(comp => {
+            comp.update();            
+        });
+    }
+
+
+    matchPosition2D(pos: Vec3) {
+        this.parent2D = pos;
+    }
+
+
+    getComponent(component: typeof Component): Component {
+        for(let i = 0; i < this.components.length; i+=1) {
+            if(this.components[i] instanceof component) return this.components[i];
+        }
+
+        return undefined;
+    }
+    
+
+    addComponent(component: typeof Component): Component {
+        const comp: Component = new component(this);
+        this.components.push(comp);
+
+        return comp;
     }
 
     rotateAround(point: Vec3, speed: number) {
@@ -29,13 +68,26 @@ export default class GameObject {
         vec3Set(this.position, vec3xVec3AddR(point, afrot_));
     }
 
+
+    // Look at function based on the tan
     lookAt(point: Vec3) {
         const reqVec = vec3xVec3SubR(point, this.position);
 
-        const rotX: number = Math.atan2(reqVec.y, Math.abs(reqVec.z));
-        const rotY: number = Math.atan2(reqVec.x, reqVec.z);
-        
 
+        // I had a bug where the camera would look down at some point so
+        // after debugging i came up with this, its not smooth but it works
+        // and i don't know why
+        const x: number  = Math.abs(reqVec.x);
+        const z: number  = Math.abs(reqVec.z);
+        
+        const xz: number = Math.max(x, z);
+        // -----------------------------------------------------------------
+
+
+        const rotX: number = Math.atan2(reqVec.y, xz);
+        const rotY: number = Math.atan2(reqVec.x, reqVec.z);
+    
+        
 
 
         // const rotX = Math.atan2(forward.z - reqVec.z, forward.y - reqVec.y);
@@ -45,7 +97,8 @@ export default class GameObject {
 
         // console.log(vec3SqrMagnitude(vec3Cross(reqVec, forward)));
         
-
+        
+        
         /*
         console.log({
             x: rotX,
@@ -87,7 +140,6 @@ export default class GameObject {
  
         return { x: xPos, y: 0, z: zPos }
     } 
-
 
 
     calculateInverseCs() {

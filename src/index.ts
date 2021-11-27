@@ -1,70 +1,125 @@
 import Scene from "./scene";
 import ContextRenderer from "./contextRenderer";
-import { Cube, Sphere } from "./graphics/primitive";
 import { parseObj } from "./utils/objParser";
 import { join } from "path";
-import { Light } from "./graphics/light";
-import { Camera } from "./graphics/camera";
-import Mesh from "./graphics/mesh";
-import { Triangle } from "./graphics/triangle";
-import { Vec3 } from "./utils/vecUtils";
+import { Light } from "./core/light";
+import { Camera } from "./core/camera";
+import Mesh from "./core/mesh";
+import { Triangle } from "./core/triangle";
+import { Ball } from "./2d-pool/ball";
+import { drawGameObjects } from "./2d-pool/renderer";
+import GameObject from "./core/gameobject";
+import { sphereTriangles } from "./core/primitive";
+import { checkBallCollision } from "./2d-pool/collisions";
+import { RigidBody2D } from "./core/rigidbody";
 
-window.onload = function () {
-    const scene : Scene = new Scene();
-    const floor : Mesh = new Mesh();
-    const wall  : Mesh = new Mesh();
-    const table : Mesh = parseObj(join(__dirname, "/assets/bill-table.obj"));
+function createPoolManager(scene: Scene, balls: Array<Ball>): GameObject {
+    const poolManager: GameObject = new GameObject();
 
-    const FLOORX: number = 25;
-    const FLOORZ: number = 25;
+    balls.push(new Ball(1));
+    balls.push(new Ball(1));
 
-    const WALLY: number = 25;
 
-    for(let i = 0; i < FLOORX; i+=1)
-    for(let j = 0; j < FLOORZ; j+=1) {
+    balls[0].position  = { x: 16,
+                           y: 12,
+                           z: 5};
+                        
+    balls[1].position  = { x: 12,
+                           y: 12,
+                           z: 5};
+    
+    const rb: RigidBody2D = balls[0].getComponent(RigidBody2D) as RigidBody2D;
+    rb.addForce({x: -.5, y: 0});
+    poolManager.update = (dt: number) => {
+        checkBallCollision(balls);
+        
+    }
+
+    for(let i = 0; i < balls.length; i+=1){
+        scene.addGameObject(balls[i]);
+    }
+
+    return poolManager;
+}
+
+
+function createFloor(floor_x: number, floor_z: number): GameObject {
+    const floor : GameObject = new GameObject();
+    const floorMesh: Mesh = floor.addComponent(Mesh) as Mesh;
+
+    for(let i = 0; i < floor_x; i+=1)
+    for(let j = 0; j < floor_z; j+=1) {
         let c_ = (i+j)%2 == 1 ? 255 : 0;
-        floor.triangles.push(
+        floorMesh.triangles.push(
             new Triangle({x: i + 1, y: 0, z: j + 1}, {x: i + 1, y: 0, z: j}, {x: i, y: 0, z: j}, {r: c_, g: c_, b: c_}),
             new Triangle({x: i, y: 0, z: j + 1}, {x: i + 1, y: 0, z: j + 1}, {x: i, y: 0, z: j}, {r: c_, g: c_, b: c_}),
         )
     }
 
+    return floor;
+}
 
-    wall.triangles.push(
-        new Triangle({x: 0, y: 0, z: 0}, {x: FLOORX, y: 0, z: 0}, {x: 0, y: WALLY, z: 0}),
-        new Triangle({x: FLOORX, y: 0, z: 0}, {x: FLOORX, y: WALLY, z: 0}, {x: 0, y: WALLY, z: 0})
-    );
+// Read the README.md for instructions to run the program
+window.onload = function () {
 
+    // Creating a scene
+    const scene : Scene = new Scene();
 
+    const balls: Array<Ball> = new Array<Ball>();
+    const poolManager: GameObject = createPoolManager(scene, balls);
 
+    scene.addGameObject(poolManager);
 
-    /*
-        ######
-        ######
-        ######
-        ######
-    */
+    // Creating objects for the scene
 
+    //#region Making spheres
+    const spheres: Array<GameObject> = new Array<GameObject>(balls.length);
+
+    for(let i = 0; i < spheres.length; i+=1){
+
+        spheres[i] = new GameObject();
+
+        let sphereMesh: Mesh = spheres[i].addComponent(Mesh) as Mesh;
+        sphereMesh.triangles = sphereTriangles(4);
+
+        spheres[i].matchPosition2D(balls[i].position);
+
+        scene.addGameObject(spheres[i]);
+    }
+    //#endregion
+
+    //#region Floor Creation
+    const FLOORX: number = 25;
+    const FLOORZ: number = 25;
+
+    const floor: GameObject = createFloor(FLOORX, FLOORZ);
+    scene.addGameObject(floor);
+    //#endregion
+    
+    //#region Table loading
+    const table : GameObject = parseObj(join(__dirname, "/assets/bill-table.obj"));
+
+    // Initializing the table position
     table.position  = { x: (FLOORX / 2) >> 0,
                         y: 1,
                         z: (FLOORZ / 2) >> 0};
 
-    scene.meshes.push(table);
-    scene.meshes.push(floor);
-    scene.meshes.push(wall );
+    scene.addGameObject(table );
+    //#endregion
 
-    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0) - 4.5,
-                                      y: 3.5,
+
+    // Creating a camera for the scene
+    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),
+                                      y: 7,
                                       z: ((FLOORZ / 2) >> 0) - 4.5}, {x: Math.PI / 5, 
                                                                       y: 0, 
                                                                       z: 0});
 
-                                                                      
+
+    // Creating a light for the scene
     scene.lights.push(new Light(1, {x: 0,y: 1, z: 0}, {x: Math.PI / 5, y: 0, z: 0}));//{x: Math.PI / 2, y: 0, z: 0}));
 
-    // scene.meshes.push(new Cube(8));
-    // scene.meshes.push(new Sphere(8, {x: 5, y: 0, z: 0}));
 
-    const renderer = new ContextRenderer(scene, "app", { showfps: true });
-    //const renderer = new Renderer(scene, "app", { showfps: true });
+    // Initialize a renderer
+    new ContextRenderer(scene, "app", { showfps: true });
 };

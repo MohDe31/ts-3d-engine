@@ -35,7 +35,7 @@ export class Camera extends GameObject {
 
         let { x, y } = this.getCenterUV();
 
-        if(camPoints.z <= 0) camPoints.z = .00001;
+        if(camPoints.z <= 0) return undefined;
 
         let xz = camPoints.x / camPoints.z;
         let yz = camPoints.y / camPoints.z;

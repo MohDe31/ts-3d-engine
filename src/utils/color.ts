@@ -76,39 +76,3 @@ export function rgbToHsv(color: Color): HSVColor {
         v: cMax,
     }
 }
-
-
-/*
-export default class Color {
-    static readonly RED: Color = new Color(255, 0, 0, 255);
-    static readonly GREEN: Color = new Color(0, 255, 0, 255);
-    static readonly BLUE: Color = new Color(0, 0, 255, 255);
-    static readonly YELLOW: Color = new Color(255, 255, 0, 255);
-    static readonly WHITE: Color = new Color(255, 255, 255, 255);
-    static readonly BLACK: Color = new Color(0, 0, 0, 255);
-
-    r: number;
-    g: number;
-    b: number;
-    a: number;
-
-    constructor();
-    constructor(r: number, g: number, b: number);
-    constructor(r: number, g: number, b: number, a: number);
-    constructor(r?: number, g?: number, b?: number, a?: number) {
-        this.r = r || 0;
-        this.g = g || 0;
-        this.b = b || 0;
-        this.a = a || 0;
-    }
-
-    normalize(): Object {
-        return {
-            r: this.r / 255,
-            g: this.g / 255,
-            b: this.b / 255,
-            a: this.a / 255,
-        };
-    }
-}
-*/

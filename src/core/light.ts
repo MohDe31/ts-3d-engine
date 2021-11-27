@@ -10,6 +10,7 @@ export class Light extends GameObject {
     constructor(intensity: number, position: Vec3, rotation: Vec3) {
         super(position, rotation);
 
+        // How much light this light source emits
         this.intensity = Math.min(intensity || 1);
     }
 

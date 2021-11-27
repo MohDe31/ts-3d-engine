@@ -1,3 +1,6 @@
+// Vector calculations and utilities
+
+
 export type Vec2 = {
     x: number,
     y: number
@@ -89,4 +92,64 @@ export function vec3Cross(v1: Vec3, v2: Vec3): Vec3 {
         y: v2.x * v1.z - v1.x * v2.z,
         z: v1.x * v2.y - v2.x * v1.y
     }
+}
+
+
+
+
+export function vec2Set(v1: Vec2, x: number, y: number) {
+    v1.x = x;
+    v1.y = y;
+}
+
+export function vec2xVec2Add(v1: Vec2, v2: Vec2) {
+    v1.x += v2.x;
+    v1.y += v2.y;
+}
+
+export function vec2xVec2SubR(v1: Vec2, v2: Vec2): Vec2 {
+    return {
+        x: v1.x - v2.x,
+        y: v1.y - v2.y
+    }
+}
+
+export function vec2xVec2AddR(v1: Vec2, v2: Vec2): Vec2 {
+    return {
+        x: v1.x + v2.x,
+        y: v1.y + v2.y
+    }
+}
+
+
+export function vec2xNumMulR(vec: Vec2, num: number): Vec2 {
+    return {
+        x: vec.x * num,
+        y: vec.y * num
+    }
+}
+
+export function vec2xNumDivR(vec: Vec2, num: number): Vec2 {
+    if(!num) num = .000001;
+    return {
+        x: vec.x / num,
+        y: vec.y / num
+    }
+}
+
+export function vec2SqrMagnitude(vec: Vec2): number {
+    return (vec.x * vec.x + vec.y * vec.y)
+}
+
+export function vec2Magnitude(vec: Vec2): number {
+    return Math.sqrt(vec2SqrMagnitude(vec));
+}
+
+export function vec2Normal(vec: Vec2): Vec2 {
+    let magnitude = vec2Magnitude(vec);
+    return vec2xNumDivR(vec, magnitude);
+}
+
+export function vec2Dot(v1: Vec2, v2: Vec2): number {
+    return v1.x * v2.x + v1.y * v2.y;
 }
