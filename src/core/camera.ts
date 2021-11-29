@@ -30,8 +30,8 @@ export class Camera extends GameObject {
 
 
     worldToScreenPoint(point: Vec3): Vec2 {
-        let camPoints: Vec3 = vec3xVec3SubR(point, this.position);
-        camPoints = rotateCs(camPoints, this.cos, this.sin);
+        let camPoints: Vec3 = vec3xVec3SubR(point, this.transform.position);
+        camPoints = rotateCs(camPoints, this.transform.cos, this.transform.sin);
 
         let { x, y } = this.getCenterUV();
 

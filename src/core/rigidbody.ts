@@ -1,4 +1,4 @@
-import { DRAG } from "../scripts/constants";
+import { DRAG } from "../constants";
 import { Vec2, vec2Set, vec2xNumMulR, vec2xVec2Add } from "../utils/vecUtils";
 import { Component } from "./component";
 import GameObject from "./gameobject";
@@ -22,8 +22,8 @@ export class RigidBody2D extends Component {
     update() {
         vec2xVec2Add(this.velocity, this.force);
 
-        this.gameObject.position.x += this.velocity.x;
-        this.gameObject.position.z += this.velocity.y;
+        this.gameObject.transform.position.x += this.velocity.x;
+        this.gameObject.transform.position.z += this.velocity.y;
 
         vec2Set(this.force       , 0, 0);
         vec2Set(this.acceleration, 0, 0);

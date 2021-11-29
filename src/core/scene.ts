@@ -8,21 +8,12 @@ import { vec3xNumMulR, vec3xVec3Add } from "../utils/vecUtils";
 
 export default class Scene {
     private gameObjects: Array<GameObject>;
+    
+    public camera: Camera;
 
     selectedElementIdx: number;
 
     world: WorldSettings;
-
-    private _camera: Camera;
-
-    set camera(cam: Camera) {
-        this._camera = cam;
-        this.addGameObject(cam);
-    }
-
-    get camera(): Camera {
-        return this._camera;
-    }
 
 
     lights: Array<Light>;

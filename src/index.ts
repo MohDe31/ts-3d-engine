@@ -6,17 +6,23 @@ import { Camera } from "./core/camera";
 import Mesh from "./core/mesh";
 import { Triangle } from "./core/triangle";
 import { Ball } from "./scripts/ball";
-import { drawGameObjects } from "./test/renderer";
 import GameObject from "./core/gameobject";
 import { sphereTriangles } from "./core/primitive";
-import { checkBallCollision } from "./scripts/collisions";
 import { RigidBody2D } from "./core/rigidbody";
 import { Renderer } from "./core/renderer";
 import { CameraMovements } from "./scripts/cameraMovements";
+import { BallCollisionHandler } from "./scripts/collisions";
+import { vec3Set } from "./utils/vecUtils";
+import { Cue } from "./scripts/cue";
 
-function initializeBalls(scene: Scene) {
+function initializeBalls(scene: Scene, camera: Camera) {
     
     const spheres: Array<GameObject> = new Array<GameObject>(2);
+    const gameManager: GameObject = new GameObject();
+    scene.addGameObject(gameManager);
+
+
+    const ballCollisionHandler: BallCollisionHandler = gameManager.addComponent(BallCollisionHandler) as BallCollisionHandler;
 
     for(let i = 0; i < spheres.length; i+=1){
 
@@ -26,10 +32,19 @@ function initializeBalls(scene: Scene) {
         sphereMesh.triangles = sphereTriangles(4);
 
         spheres[i].addComponent(RigidBody2D);
-        spheres[i].addComponent(Ball);
+        ballCollisionHandler.balls.push(spheres[i].addComponent(Ball) as Ball);
 
         scene.addGameObject(spheres[i]);
     }
+    
+
+    const cue: Cue = gameManager.addComponent(Cue) as Cue;
+    cue.camera = camera.transform;
+    cue.whiteBall = ballCollisionHandler.balls[0].transform;
+    cue.whiteBallRigid = ballCollisionHandler.balls[0].rigidBody;
+
+    (spheres[0].getComponent(Mesh) as Mesh).triangles.forEach(tri => tri.material.r = 0);
+
 
     (spheres[0].getComponent(RigidBody2D) as RigidBody2D).addForce({x: 1, y: 0});
 }
@@ -57,9 +72,6 @@ window.onload = function () {
     // Creating a scene
     const scene : Scene = new Scene();
 
-    //Making spheres
-    initializeBalls(scene);
-
     //#region Floor Creation
     const FLOORX: number = 25;
     const FLOORZ: number = 25;
@@ -72,7 +84,7 @@ window.onload = function () {
     const table : GameObject = parseObj(join(__dirname, "/assets/bill-table.obj"));
 
     // Initializing the table position
-    table.position  = { x: (FLOORX / 2) >> 0,
+    table.transform.position  = { x: (FLOORX / 2) >> 0,
                         y: 1,
                         z: (FLOORZ / 2) >> 0};
 
@@ -81,8 +93,15 @@ window.onload = function () {
 
 
     // Creating a camera for the scene
-    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5}, {x: Math.PI / 5, y: 0, z: 0});
+    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5},  {x: Math.PI / 5, y: 0, z: 0});
     scene.camera.addComponent(CameraMovements);
+    scene.addGameObject(scene.camera);
+
+
+
+
+    //Making spheres
+    initializeBalls(scene, scene.camera);
 
 
     // Creating a light for the scene

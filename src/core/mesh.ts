@@ -34,7 +34,7 @@ export default class Mesh extends Component {
 
     draw(ctx: CanvasRenderingContext2D, camera: Camera, lights: Array<Light>) {
         // Calculate the cos, sin of the mesh to avoid recalculating
-        this.gameObject.calculateCs();
+        this.gameObject.transform.calculateCs();
 
         // Declaring needed variables to avoid re-declaration, "giving the garbage collector a break"
         let triangle: Triangle;
@@ -54,7 +54,7 @@ export default class Mesh extends Component {
         // ------------------------------------------------------------------------------------------
 
         // Calculating the normal of every light source in the scene TODO: move this to the drawScene renderer
-        const lightNormalArr: Array<Vec3> = lights.map(light => light.forward());
+        const lightNormalArr: Array<Vec3> = lights.map(light => light.transform.forward());
 
         // An array to store the visible triangles
         const drawingTriangle: Array<Triangle> = new Array<Triangle>();
@@ -65,20 +65,20 @@ export default class Mesh extends Component {
             triangle = this.triangles[i];
 
             // Rotating the triangle points
-            rotated_p1 = rotateCs(triangle.points[0], this.gameObject.cos, this.gameObject.sin);
-            rotated_p2 = rotateCs(triangle.points[1], this.gameObject.cos, this.gameObject.sin);
-            rotated_p3 = rotateCs(triangle.points[2], this.gameObject.cos, this.gameObject.sin);
+            rotated_p1 = rotateCs(triangle.points[0], this.transform.cos, this.transform.sin);
+            rotated_p2 = rotateCs(triangle.points[1], this.transform.cos, this.transform.sin);
+            rotated_p3 = rotateCs(triangle.points[2], this.transform.cos, this.transform.sin);
 
             // Translating the triangle points
-            translated_1 = vec3xVec3AddR(rotated_p1, this.gameObject.position);
-            translated_2 = vec3xVec3AddR(rotated_p2, this.gameObject.position);
-            translated_3 = vec3xVec3AddR(rotated_p3, this.gameObject.position);
+            translated_1 = vec3xVec3AddR(rotated_p1, this.transform.position);
+            translated_2 = vec3xVec3AddR(rotated_p2, this.transform.position);
+            translated_3 = vec3xVec3AddR(rotated_p3, this.transform.position);
 
             // Calculating the center point (translated_1 + translated_2 + translated_3) / 3
             center  = vec3xNumDivR(vec3xVec3AddR(vec3xVec3AddR(translated_1, translated_2), translated_3), 3);
             
             // Center - Camera position
-            cameraDiff = vec3xVec3SubR(center, camera.position);
+            cameraDiff = vec3xVec3SubR(center, camera.transform.position);
 
             // Calculating the cross product -----------------
             v21 = vec3xVec3SubR(translated_2, translated_1);
@@ -92,9 +92,9 @@ export default class Mesh extends Component {
             
             // triangle average Z is the minimum between the points distance from the camera
             // using the (distance^2) to avoid the sqrt calculating as it takes more time to calculate
-            triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.position)),
-                                     vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.position)),
-                                     vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.position)));
+            triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.transform.position)),
+                                     vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.transform.position)),
+                                     vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.transform.position)));
 
 
             // if the DotProduct between normal and the cam - center
