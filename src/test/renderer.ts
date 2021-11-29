@@ -12,7 +12,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D, balls: Array<Ball
     for(let i = 0; i < balls.length; i+=1) {
         const ball: Ball = balls[i];
         ctx.beginPath();
-        ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, Math.PI*2, true); 
+        ctx.arc(ball.gameObject.position.x, ball.gameObject.position.y, ball.radius, 0, Math.PI*2, true); 
         ctx.closePath();
         ctx.fill();
     }

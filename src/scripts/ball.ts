@@ -1,33 +1,28 @@
+import { Component } from "../core/component";
 import GameObject from "../core/gameobject";
 import { RigidBody2D } from "../core/rigidbody";
 import { Vec2, vec2Dot, vec2Magnitude, vec2Normal, vec2xNumMulR, vec2xVec2Add, vec2xVec2AddR, vec2xVec2SubR } from "../utils/vecUtils";
 
 
-export class Ball extends GameObject {
+export class Ball extends Component {
     
     public rigidBody: RigidBody2D;
 
     public potted: boolean;
     public radius: number;
 
-    constructor(radius: number) {
-        super();
+    constructor(gameObject: GameObject) {
+        super(gameObject);
         
         this.potted = false;
-        this.radius = radius;
-        this.rigidBody = this.addComponent(RigidBody2D) as RigidBody2D;
+        this.radius = 1;
+        this.rigidBody = this.gameObject.getComponent(RigidBody2D) as RigidBody2D;
     }
 
-    update(dt: number){
-        super.update(dt);
-    }
-
-    pot() {
-        this.potted = true;
-    }
+    pot() { this.potted = true; }
 
     checkCollision(ball: Ball){
-        const n: Vec2 = vec2xVec2SubR(this.position, ball.position);        
+        const n: Vec2 = vec2xVec2SubR(this.gameObject.position, ball.gameObject.position);        
 
         
         const req_dist: number = this.radius + ball.radius
@@ -41,8 +36,8 @@ export class Ball extends GameObject {
 
         const un: Vec2 = vec2Normal(n);
 
-        vec2xVec2Add(this.position, vec2xNumMulR(un, mtd));
-        vec2xVec2Add(ball.position, vec2xNumMulR(un, -mtd));
+        vec2xVec2Add(this.gameObject.position, vec2xNumMulR(un, mtd));
+        vec2xVec2Add(ball.gameObject.position, vec2xNumMulR(un, -mtd));
 
         // tangent vector
         const ut: Vec2 = {x: -un.y,

@@ -9,13 +9,21 @@ import { vec3xNumMulR, vec3xVec3Add } from "../utils/vecUtils";
 export default class Scene {
     private gameObjects: Array<GameObject>;
 
-
-
     selectedElementIdx: number;
 
     world: WorldSettings;
 
-    camera: Camera;
+    private _camera: Camera;
+
+    set camera(cam: Camera) {
+        this._camera = cam;
+        this.addGameObject(cam);
+    }
+
+    get camera(): Camera {
+        return this._camera;
+    }
+
 
     lights: Array<Light>;
     meshes: Array<Mesh>;
@@ -42,40 +50,10 @@ export default class Scene {
             this.meshes.push(mesh);
     }
 
-    update(dt: number) {
-        // Get the held keys
-        const keysIter = Keyboard.heldKeys.keys();
-        
-        // Calculate the inverse cos, sin of the camera to avoid recalculating them for every triangle
-        this.camera.calculateInverseCs();
-
-
-        // Loop on every key held
-        while(true) {
-            const {value, done} = keysIter.next();
-
-            if(done) break;
-            
-            // Some Key functions
-            switch(value){
-                case 'z': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.forward(), dt * 10));break;
-                case 's': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.forward(), -dt * 10));break;
-                case 'd': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.localRight(), dt * 10));break;
-                case 'q': vec3xVec3Add(this.camera.position, vec3xNumMulR(this.camera.localRight(), -dt * 10));break;
-                
-                case ' '      : this.camera.position.y += dt * 10;break;
-                case 'Control': this.camera.position.y -= dt * 10;break;
-
-                case 'ArrowUp': this.camera.rotation.x -= dt;break;
-                case 'ArrowDown': this.camera.rotation.x += dt;break;
-                case 'ArrowLeft': this.camera.rotation.y -= dt;break;
-                case 'ArrowRight': this.camera.rotation.y += dt;break;
-            }
-            
-        }
+    update() {
 
         this.gameObjects.forEach(gameObject => {
-            gameObject.update(dt);
+            gameObject.update();
         });
         
         // Rotate around the table position

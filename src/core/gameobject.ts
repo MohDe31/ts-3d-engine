@@ -27,16 +27,14 @@ export default class GameObject {
         this.components = new Array<Component>();
     }
 
-    update(dt: number){
+    update(){
         if(this.parent2D){
             this.position.x = this.parent2D.x;
             this.position.y = this.parent2D.z;
             this.position.z = this.parent2D.y;
         }
         // TODO: Change this to a for loop
-        this.components.forEach(comp => {
-            comp.update();            
-        });
+        this.components.forEach(comp => { comp.update(); });
     }
 
 

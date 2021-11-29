@@ -1,5 +1,4 @@
 import Scene from "./core/scene";
-import ContextRenderer from "./contextRenderer";
 import { parseObj } from "./utils/objParser";
 import { join } from "path";
 import { Light } from "./core/light";
@@ -12,34 +11,27 @@ import GameObject from "./core/gameobject";
 import { sphereTriangles } from "./core/primitive";
 import { checkBallCollision } from "./scripts/collisions";
 import { RigidBody2D } from "./core/rigidbody";
+import { Renderer } from "./core/renderer";
+import { CameraMovements } from "./scripts/cameraMovements";
 
-function createPoolManager(scene: Scene, balls: Array<Ball>): GameObject {
-    const poolManager: GameObject = new GameObject();
-
-    balls.push(new Ball(1));
-    balls.push(new Ball(1));
-
-
-    balls[0].position  = { x: 16,
-                           y: 12,
-                           z: 5};
-                        
-    balls[1].position  = { x: 12,
-                           y: 12,
-                           z: 5};
+function initializeBalls(scene: Scene) {
     
-    const rb: RigidBody2D = balls[0].getComponent(RigidBody2D) as RigidBody2D;
-    rb.addForce({x: -.5, y: 0});
-    poolManager.update = (dt: number) => {
-        checkBallCollision(balls);
-        
+    const spheres: Array<GameObject> = new Array<GameObject>(2);
+
+    for(let i = 0; i < spheres.length; i+=1){
+
+        spheres[i] = new GameObject();
+
+        let sphereMesh: Mesh = spheres[i].addComponent(Mesh) as Mesh;
+        sphereMesh.triangles = sphereTriangles(4);
+
+        spheres[i].addComponent(RigidBody2D);
+        spheres[i].addComponent(Ball);
+
+        scene.addGameObject(spheres[i]);
     }
 
-    for(let i = 0; i < balls.length; i+=1){
-        scene.addGameObject(balls[i]);
-    }
-
-    return poolManager;
+    (spheres[0].getComponent(RigidBody2D) as RigidBody2D).addForce({x: 1, y: 0});
 }
 
 
@@ -65,28 +57,8 @@ window.onload = function () {
     // Creating a scene
     const scene : Scene = new Scene();
 
-    const balls: Array<Ball> = new Array<Ball>();
-    const poolManager: GameObject = createPoolManager(scene, balls);
-
-    scene.addGameObject(poolManager);
-
-    // Creating objects for the scene
-
-    //#region Making spheres
-    const spheres: Array<GameObject> = new Array<GameObject>(balls.length);
-
-    for(let i = 0; i < spheres.length; i+=1){
-
-        spheres[i] = new GameObject();
-
-        let sphereMesh: Mesh = spheres[i].addComponent(Mesh) as Mesh;
-        sphereMesh.triangles = sphereTriangles(4);
-
-        spheres[i].matchPosition2D(balls[i].position);
-
-        scene.addGameObject(spheres[i]);
-    }
-    //#endregion
+    //Making spheres
+    initializeBalls(scene);
 
     //#region Floor Creation
     const FLOORX: number = 25;
@@ -109,11 +81,8 @@ window.onload = function () {
 
 
     // Creating a camera for the scene
-    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),
-                                      y: 7,
-                                      z: ((FLOORZ / 2) >> 0) - 4.5}, {x: Math.PI / 5, 
-                                                                      y: 0, 
-                                                                      z: 0});
+    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5}, {x: Math.PI / 5, y: 0, z: 0});
+    scene.camera.addComponent(CameraMovements);
 
 
     // Creating a light for the scene
@@ -121,5 +90,5 @@ window.onload = function () {
 
 
     // Initialize a renderer
-    new ContextRenderer(scene, "app", { showfps: true });
+    Renderer.init(scene, "app", { showfps: true });
 };
