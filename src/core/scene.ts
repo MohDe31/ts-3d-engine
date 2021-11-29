@@ -1,10 +1,10 @@
-import { config } from "./config";
-import { Camera } from "./core/camera";
-import GameObject from "./core/gameobject";
-import { Light } from "./core/light";
-import Mesh from "./core/mesh";
-import { Keyboard } from "./utils/keyboard";
-import { vec3xNumMulR, vec3xVec3Add } from "./utils/vecUtils";
+import { config } from "../config";
+import { Camera } from "./camera";
+import GameObject from "./gameobject";
+import { Light } from "./light";
+import Mesh from "./mesh";
+import { Keyboard } from "./keyboard";
+import { vec3xNumMulR, vec3xVec3Add } from "../utils/vecUtils";
 
 export default class Scene {
     private gameObjects: Array<GameObject>;
@@ -94,11 +94,5 @@ export default class Scene {
         for(let i = 0; i < this.meshes.length; i+=1) {
             this.meshes[i].draw(ctx, this.camera, this.lights);
         }
-    }
-
-    keyHandler(e: KeyboardEvent, key) {
-        // Registering key strokes 
-        if(e.type == "keydown") Keyboard.addKey(key);
-        else if(e.type == "keyup") Keyboard.removeKey(key);
     }
 }

@@ -1,4 +1,4 @@
-import { DRAG } from "../2d-pool/constants";
+import { DRAG } from "../scripts/constants";
 import { Vec2, vec2Set, vec2xNumMulR, vec2xVec2Add } from "../utils/vecUtils";
 import { Component } from "./component";
 import GameObject from "./gameobject";

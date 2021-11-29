@@ -1,5 +1,5 @@
-import { Ball } from "./ball";
-import { TABLE_X, TABLE_Z } from "./constants";
+import { Ball } from "../scripts/ball";
+import { TABLE_X, TABLE_Z } from "../scripts/constants";
 
 
 

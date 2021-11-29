@@ -1,5 +1,5 @@
 import { cameraProjectionConfig } from "../config";
-import Scene from "../scene";
+import Scene from "./scene";
 import { Vec3, Vec2, vec3xVec3SubR } from "../utils/vecUtils";
 import { rotateCs } from "./engine";
 import GameObject from "./gameobject";

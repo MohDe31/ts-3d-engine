@@ -1,4 +1,4 @@
-import Scene from "./scene";
+import Scene from "./core/scene";
 import ContextRenderer from "./contextRenderer";
 import { parseObj } from "./utils/objParser";
 import { join } from "path";
@@ -6,11 +6,11 @@ import { Light } from "./core/light";
 import { Camera } from "./core/camera";
 import Mesh from "./core/mesh";
 import { Triangle } from "./core/triangle";
-import { Ball } from "./2d-pool/ball";
-import { drawGameObjects } from "./2d-pool/renderer";
+import { Ball } from "./scripts/ball";
+import { drawGameObjects } from "./test/renderer";
 import GameObject from "./core/gameobject";
 import { sphereTriangles } from "./core/primitive";
-import { checkBallCollision } from "./2d-pool/collisions";
+import { checkBallCollision } from "./scripts/collisions";
 import { RigidBody2D } from "./core/rigidbody";
 
 function createPoolManager(scene: Scene, balls: Array<Ball>): GameObject {

@@ -1,5 +1,7 @@
 import Time from "./common/time";
-import Scene from "./scene";
+import { Keyboard } from "./core/keyboard";
+import { Mouse } from "./core/mouse";
+import Scene from "./core/scene";
 
 export default class ContextRenderer {
     
@@ -54,12 +56,20 @@ export default class ContextRenderer {
 
         // ----------Initializing key listeners-------------
         document.onkeydown = function (e: KeyboardEvent) {
-            self.scene.keyHandler(e, e.key);
+            Keyboard.KeyHandler(e);
         };
 
         document.onkeyup = function (e: KeyboardEvent) {
-            self.scene.keyHandler(e, e.key);
-        }
+            Keyboard.KeyHandler(e);
+        };
+
+        document.onmousedown = function (e: MouseEvent) {
+            Mouse.KeyHandler(e);
+        };
+
+        document.onmouseup = function (e: MouseEvent) {
+            Mouse.KeyHandler(e);
+        };
         // -------------------------------------------------
 
         // Create a instance of the time class
