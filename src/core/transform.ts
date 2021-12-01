@@ -14,17 +14,20 @@ export class Transform extends Component {
     public cos: Vec3;
     public sin: Vec3;
 
+    // Change to a vec3
+    public scale: number;
+
     constructor(gameObject: GameObject){
         super(gameObject);
 
         this.position = {x: 0, y: 0, z: 0};
         this.rotation = {x: 0, y: 0, z: 0};
+        this.scale   = 1;
 
         this.cos = { x: 0, y: 0, z: 0 };
         
         this.sin = { x: 0, y: 0, z: 0 };
     }
-
 
     rotateAround(point: Vec3, speed: number) {
         let rot_: Vec3 = vec3xVec3SubR(this.position, point);

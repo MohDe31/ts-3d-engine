@@ -1,5 +1,5 @@
 import { Color, HSVColor, hsvToRgb, rgbToHsv, rgbToString } from "../utils/color";
-import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3SqrMagnitude, vec3xNumDivR, vec3xVec3AddR, vec3xVec3SubR } from "../utils/vecUtils";
+import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3SqrMagnitude, vec3xNumDivR, vec3xNumMulR, vec3xVec3AddR, vec3xVec3SubR } from "../utils/vecUtils";
 import { Camera } from "./camera";
 import { Component } from "./component";
 import { rotateCs } from "./engine";
@@ -40,6 +40,7 @@ export default class Mesh extends Component {
         let triangle: Triangle;
         let uv1: Vec2, uv2: Vec2, uv3: Vec2;
         let rotated_p1: Vec3, rotated_p2: Vec3, rotated_p3: Vec3;
+        let scaled_1: Vec3, scaled_2: Vec3, scaled_3: Vec3;
         let translated_1: Vec3, translated_2: Vec3, translated_3: Vec3;
         let center: Vec3;
         let cameraDiff: Vec3;
@@ -64,10 +65,16 @@ export default class Mesh extends Component {
         for(let i = 0; i < this.triangles.length; i+=1) {
             triangle = this.triangles[i];
 
+            // Scaling the triangle // TODO: Make this a precalculated attribute for optimization
+            scaled_1 = vec3xNumMulR(triangle.points[0], this.transform.scale);
+            scaled_2 = vec3xNumMulR(triangle.points[1], this.transform.scale);
+            scaled_3 = vec3xNumMulR(triangle.points[2], this.transform.scale);
+
+
             // Rotating the triangle points
-            rotated_p1 = rotateCs(triangle.points[0], this.transform.cos, this.transform.sin);
-            rotated_p2 = rotateCs(triangle.points[1], this.transform.cos, this.transform.sin);
-            rotated_p3 = rotateCs(triangle.points[2], this.transform.cos, this.transform.sin);
+            rotated_p1 = rotateCs(scaled_1, this.transform.cos, this.transform.sin);
+            rotated_p2 = rotateCs(scaled_2, this.transform.cos, this.transform.sin);
+            rotated_p3 = rotateCs(scaled_3, this.transform.cos, this.transform.sin);
 
             // Translating the triangle points
             translated_1 = vec3xVec3AddR(rotated_p1, this.transform.position);

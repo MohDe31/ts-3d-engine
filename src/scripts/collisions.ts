@@ -23,7 +23,7 @@ export class BallCollisionHandler extends Component {
         for(let j = i + 1; j < this.balls.length; j+=1)
         {
             const b1: Ball = this.balls[i];
-            const b2: Ball = this.balls[j];        
+            const b2: Ball = this.balls[j];
             
             b1.checkCollision(b2)
         }

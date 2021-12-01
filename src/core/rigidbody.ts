@@ -22,8 +22,8 @@ export class RigidBody2D extends Component {
     update() {
         vec2xVec2Add(this.velocity, this.force);
 
-        this.gameObject.transform.position.x += this.velocity.x;
-        this.gameObject.transform.position.z += this.velocity.y;
+        this.transform.position.x += this.velocity.x;
+        this.transform.position.z += this.velocity.y;
 
         vec2Set(this.force       , 0, 0);
         vec2Set(this.acceleration, 0, 0);

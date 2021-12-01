@@ -21,12 +21,18 @@ export class Ball extends Component {
 
     pot() { this.potted = true; }
 
-    checkCollision(ball: Ball){
-        const n: Vec2 = vec2xVec2SubR(this.transform.position, ball.transform.position);        
+    get2DPosition(): Vec2 {
+        return {
+            x: this.transform.position.x,
+            y: this.transform.position.z
+        }
+    }
 
+    checkCollision(ball: Ball){
+        const n: Vec2 = vec2xVec2SubR(this.get2DPosition(), ball.get2DPosition());
         
         const req_dist: number = this.radius + ball.radius
-        const dist = vec2Magnitude(n);        
+        const dist = vec2Magnitude(n);
 
         if (dist > req_dist)
             return
@@ -36,8 +42,13 @@ export class Ball extends Component {
 
         const un: Vec2 = vec2Normal(n);
 
-        vec2xVec2Add(this.transform.position, vec2xNumMulR(un, mtd));
-        vec2xVec2Add(ball.transform.position, vec2xNumMulR(un, -mtd));
+        const unmtd: Vec2 = vec2xNumMulR(un, mtd);
+
+        this.transform.position.x += unmtd.x;
+        this.transform.position.z += unmtd.y;
+
+        ball.transform.position.x -= unmtd.x;
+        ball.transform.position.z -= unmtd.y;
 
         // tangent vector
         const ut: Vec2 = {x: -un.y,
