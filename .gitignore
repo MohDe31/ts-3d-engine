@@ -1,6 +1,4 @@
 node_modules
 compile
-src/renderer.ts
-src/shaders
 src/common/draggable.ts
 yarn*

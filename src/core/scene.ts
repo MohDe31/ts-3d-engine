@@ -53,7 +53,7 @@ export default class Scene {
         // this.camera.lookAt({x: (25 / 2) >> 0, y: 1, z: (25 / 2) >> 0});
 
         // Sorting meshes based on the average Z.
-        this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
+        // this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
 
     }
     

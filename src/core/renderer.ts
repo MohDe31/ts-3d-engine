@@ -1,28 +1,52 @@
-import { Time } from "./time";
 import { Keyboard } from "./keyboard";
 import { Mouse } from "./mouse";
+import { Time } from "./time";
 import Scene from "./scene";
+import { FRAGMENT_SHADER } from "../shaders/fragmentshader";
+import { VERTEX_SHADER } from "../shaders/vertexshader";
+import { Color, rgbNormal } from "../utils/color";
+import { Vec3, vec3Cross, vec3Normal, vec3xVec3SubR } from "../utils/vecUtils";
 
 export namespace Renderer {
-    
     export let initialized: boolean;
+
     export let rendererSettings: RendererSettings;
 
     export let others: Object;
 
     export let canvas: HTMLCanvasElement;
-    export let ctx: CanvasRenderingContext2D;
-    
+    export let gl: WebGL2RenderingContext;
+
+    export let webglProgram: WebGLProgram;
+
+    export let vertexShader: WebGLShader;
+    export let fragmentShader: WebGLShader;
+
+    export let positionBuffer: WebGLBuffer;
+    export let rotationBuffer: WebGLBuffer;
+    export let normalBuffer: WebGLBuffer;
+    export let vertexBuffer: WebGLBuffer;
+    export let scaleBuffer: WebGLBuffer;
+    export let colorBuffer: WebGLBuffer;
+
+    export let camPositionUniformLocation: WebGLUniformLocation;
+    export let camRotationUniformLocation: WebGLUniformLocation;
+
+    export let positionGrid: Float32Array;
+    export let rotationGrid: Float32Array;
+    export let normalGrid: Float32Array;
+    export let vertexGrid: Float32Array;
+    export let colorGrid: Float32Array;
+    export let scaleGrid: Float32Array;
+
     export let scene: Scene;
 
     export function init(scene: Scene, canvas_id?: string, settings?: RendererSettings) {
-        // Only needs one instance of this class
         if (Renderer.initialized) {
             alert("A renderer instance already exists");
             return;
         }
 
-        Renderer.initialized = true;
 
         Renderer.rendererSettings = settings;
         Renderer.others = new Object();
@@ -30,13 +54,6 @@ export namespace Renderer {
         Renderer.scene = scene;
 
         Renderer.loadCanvas(canvas_id);
-
-        // Flip the canvas.
-        Renderer.canvas.style.transform = 'scale(1, -1)';
-
-        // this.canvas.style.transform = 'rotate(180deg)';
-        
-        // If the show fps boolean is true then create a new div to show the FPS
         if (Renderer.rendererSettings?.showfps) {
             let container = Renderer.canvas.parentElement;
             let fpsdiv = document.createElement("div");
@@ -46,7 +63,27 @@ export namespace Renderer {
         }
 
         // @ts-ignore
-        Renderer.ctx = this.canvas.getContext("2d");
+        Renderer.gl = Renderer.canvas.getContext("webgl");
+
+        if (!Renderer.gl) {
+            alert("WebGL is not supported by your browser");
+            return;
+        }
+
+        const points = Renderer.scene.meshes.map((mesh) => mesh.triangles.length).reduce((a,b) => a+b) * 9;
+
+        Renderer.positionGrid = new Float32Array(points);
+        Renderer.rotationGrid = new Float32Array(points);
+        Renderer.normalGrid = new Float32Array(points);
+        Renderer.vertexGrid = new Float32Array(points);
+        Renderer.colorGrid = new Float32Array(points);
+        Renderer.scaleGrid = new Float32Array(points);
+
+        Renderer.setupWebGL();
+
+        // setDraggable(Renderer.canvas, Renderer.scene.onMouseDrag, Renderer.scene);
+
+        var self = Renderer;
 
         // ----------Initializing key listeners-------------
         document.onkeydown = function (e: KeyboardEvent) {
@@ -66,35 +103,87 @@ export namespace Renderer {
         };
 
         // -------------------------------------------------
+
+        /**
+         *
+         */
+        Renderer.setClearColor(0, 0, 0, 0);
+
         requestAnimationFrame(Renderer.render);
     }
 
     export function render(time: number) {
-        // Flag to calculate the FPS, delta-time
         Time.updateDeltaTime(time);
-
         if (Renderer.rendererSettings?.showfps) {
-            // Update the FPS
             Renderer.others["fpsdiv"].innerHTML = Time.FPS;
         }
-        
+
 
         Renderer.scene.update();
 
-        // Clear Color
-        Renderer.ctx.fillStyle = "BLACK";
+        // Renderer.scene.updateScene(Renderer.time.dt / 1000);
+        Renderer.gl.clear(Renderer.gl.COLOR_BUFFER_BIT);
+        // Renderer.scene.update();
 
-        // Clear the canvas
-        Renderer.ctx.fillRect(0, 0, Renderer.canvas.width, Renderer.canvas.height);
+        let i = 0;
 
-        // Draw the current Scene
-        Renderer.scene.drawScene(Renderer.ctx);
+        const position_array = [];
+        const rotation_array = [];
+        const normal_array = [];
+        const points_array = [];
+        const colors_array = [];
+        const scales_array = [];
 
-        // Request a new frame
+        let rgb_normal: Color;
+        let tri_normal: Vec3;
+        
+        Renderer.gl.uniform3f(Renderer.camPositionUniformLocation, 
+                Renderer.scene.camera.transform.position.x,
+                Renderer.scene.camera.transform.position.y,
+                Renderer.scene.camera.transform.position.z);
+        
+        Renderer.gl.uniform3f(Renderer.camRotationUniformLocation, 
+                Renderer.scene.camera.transform.rotation.x,
+                Renderer.scene.camera.transform.rotation.y,
+                Renderer.scene.camera.transform.rotation.z);
+
+
+        // Renderer.scene.meshes.sort((a, b) => a.getAvgZ() - b.getAvgZ());
+        let v21, v31;
+
+        Renderer.scene.meshes.forEach((mesh) => {
+            mesh.triangles.forEach(tri=>{
+
+                v21 = vec3xVec3SubR(tri.points[1], tri.points[0]);
+                v31 = vec3xVec3SubR(tri.points[2], tri.points[0]);
+    
+                tri_normal = vec3Normal(vec3Cross(v21, v31));
+                rgb_normal = rgbNormal(tri.material);
+
+                tri.points.forEach(pt => {
+                    ++i;
+                    position_array.push(mesh.transform.position.x, mesh.transform.position.y, mesh.transform.position.z);
+                    rotation_array.push(mesh.transform.rotation.x, mesh.transform.rotation.y, mesh.transform.rotation.z);
+                    scales_array.push(mesh.transform.scale.x, mesh.transform.scale.y, mesh.transform.scale.z);
+                    colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b);
+                    normal_array.push(tri_normal.x, tri_normal.y, tri_normal.z);
+                    points_array.push(pt.x, pt.y, pt.z);
+                })
+            });
+        });
+        
+        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.positionBuffer, new Float32Array(position_array));
+        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.rotationBuffer, new Float32Array(rotation_array));
+        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexBuffer, new Float32Array(points_array));
+        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.normalBuffer, new Float32Array(normal_array));
+        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorBuffer, new Float32Array(colors_array));
+        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.scaleBuffer, new Float32Array(scales_array));
+
+        Renderer.gl.drawArrays(Renderer.gl.TRIANGLES, 0, i);
+
         requestAnimationFrame(Renderer.render);
     }
 
-    // Get the canvas element based on the ID
     export function loadCanvas(canvas_id: string) {
         Renderer.canvas = document.querySelector(`#${canvas_id}`);
 
@@ -108,6 +197,99 @@ export namespace Renderer {
         Renderer.canvas.height = window.innerHeight;
 
         Renderer.scene.world.WIDTH = Renderer.canvas.width;
-        Renderer.scene.world.HEIGHT = this.canvas.height;
+        Renderer.scene.world.HEIGHT = Renderer.canvas.height;
+    }
+
+    export function createShader(type: number, src: string): WebGLShader {
+        let shader = Renderer.gl.createShader(type);
+        Renderer.gl.shaderSource(shader, src);
+        Renderer.gl.compileShader(shader);
+
+        if (!Renderer.gl.getShaderParameter(shader, Renderer.gl.COMPILE_STATUS)) {
+            throw `${type == Renderer.gl.VERTEX_SHADER ? "VERTEX_SHADER" : "FRAGMENT_SHADER"} [COMPILE_ERROR]: ${Renderer.gl.getShaderInfoLog(shader)}`;
+        }
+        return shader;
+    }
+
+    export function createProgram(vert: WebGLShader, frag: WebGLShader): WebGLProgram {
+        let program = Renderer.gl.createProgram();
+        Renderer.gl.attachShader(program, vert);
+        Renderer.gl.attachShader(program, frag);
+
+        Renderer.gl.linkProgram(program);
+
+        if (!Renderer.gl.getProgramParameter(program, Renderer.gl.LINK_STATUS)) {
+            throw `"PROGRAM [LINK_ERROR]: ${Renderer.gl.getProgramInfoLog(program)}`;
+        }
+
+        Renderer.gl.validateProgram(program);
+        Renderer.gl.useProgram(program);
+
+        return program;
+    }
+
+    export function createBuffer(target: number, srcData: BufferSource, usage: number, location: string, size: number, type: number): WebGLBuffer {
+        let buffer = Renderer.gl.createBuffer();
+        Renderer.gl.bindBuffer(target, buffer);
+        Renderer.gl.bufferData(target, srcData, usage);
+
+        let attrLoc = Renderer.gl.getAttribLocation(Renderer.webglProgram, location);
+        Renderer.gl.vertexAttribPointer(attrLoc, size, type, false, 0, 0);
+        Renderer.gl.enableVertexAttribArray(attrLoc);
+
+        return buffer;
+    }
+
+    export function updateBuffer(target: number, buffer: WebGLBuffer, srcData: BufferSource, offset: number = 0) {
+        Renderer.gl.bindBuffer(target, buffer);
+        Renderer.gl.bufferSubData(target, offset, srcData);
+    }
+
+    export function setupWebGL() {
+        try {
+            Renderer.vertexShader = Renderer.createShader(Renderer.gl.VERTEX_SHADER, VERTEX_SHADER);
+            Renderer.fragmentShader = Renderer.createShader(Renderer.gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
+
+            Renderer.webglProgram = Renderer.createProgram(Renderer.vertexShader, Renderer.fragmentShader);
+
+            // TODO: DYNAMIC_DRAW
+            Renderer.positionBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.positionGrid, Renderer.gl.STATIC_DRAW, "a_position", 3, Renderer.gl.FLOAT);
+            Renderer.rotationBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.rotationGrid, Renderer.gl.STATIC_DRAW, "a_rotation", 3, Renderer.gl.FLOAT);
+            Renderer.normalBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.normalGrid, Renderer.gl.STATIC_DRAW, "a_normal", 3, Renderer.gl.FLOAT);
+            Renderer.vertexBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexGrid, Renderer.gl.STATIC_DRAW, "a_point", 3, Renderer.gl.FLOAT);
+            Renderer.colorBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorGrid, Renderer.gl.STATIC_DRAW, "a_color", 3, Renderer.gl.FLOAT);
+            Renderer.scaleBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.scaleGrid, Renderer.gl.STATIC_DRAW, "a_scale", 3, Renderer.gl.FLOAT);
+
+            Renderer.camPositionUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_camPosition");
+            Renderer.camRotationUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_camRotation");
+            
+            let widthHeightUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_size");
+            let fovUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_f");
+            let lightUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_lights");
+            let lightsCountLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_lightsCount");
+
+            const lightNormals: Array<number> = new Array<number>();
+
+            Renderer.scene.lights.forEach((light) => {
+                const forward: Vec3 = light.transform.forward();
+
+                lightNormals.push(forward.x, forward.y, forward.z);
+            });
+
+            Renderer.gl.uniform1i(lightsCountLocation, Renderer.scene.lights.length);
+            Renderer.gl.uniform3fv(lightUniformLocation, new Float32Array(lightNormals));
+            Renderer.gl.uniform2f(widthHeightUniformLocation, Renderer.canvas.width, Renderer.canvas.height);
+            Renderer.gl.uniform1f(fovUniformLocation, Renderer.scene.camera.config.F)
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    export function getBoundRect(): DOMRect {
+        return Renderer.canvas.getBoundingClientRect();
+    }
+
+    export function setClearColor(r: number, g: number, b: number, a?: number) {
+        Renderer.gl.clearColor(r, g, b, a || 1.0);
     }
 }

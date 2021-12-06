@@ -7,11 +7,11 @@ import { Ball } from "./scripts/ball";
 import GameObject from "./core/gameobject";
 import { cubeTriangles, sphereTriangles } from "./core/primitive";
 import { RigidBody2D } from "./core/rigidbody";
-import { Renderer } from "./core/renderer";
 import { CameraMovements } from "./scripts/cameraMovements";
 import { BallCollisionHandler } from "./scripts/collisions";
 import { Cue } from "./scripts/cue";
 import { Vec2 } from "./utils/vecUtils";
+import { Renderer } from "./core/renderer";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2) {
@@ -54,6 +54,7 @@ function initializeBalls(scene: Scene, camera: Camera) {
     for(let i = 0; i < 5; i+=1)
     for(let j = i; j < 5; j+=1) {
         const sphere: GameObject = new GameObject();
+        sphere.transform.position.y = 3;
 
         makeBall(sphere, ballCollisionHandler, {x: (j * 2) - i, y: i * 2});
 
@@ -62,6 +63,8 @@ function initializeBalls(scene: Scene, camera: Camera) {
     }
 
     const whiteSphere: GameObject = new GameObject();
+    whiteSphere.transform.position.y = 3;
+    
     makeBall(whiteSphere, ballCollisionHandler, {x: 5, y: 50});
     
     scene.addGameObject(whiteSphere);
@@ -110,7 +113,6 @@ window.onload = function () {
     scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5});//,  {x: Math.PI / 5, y: 0, z: 0});
     scene.camera.addComponent(CameraMovements);
     scene.addGameObject(scene.camera);
-
 
 
     makeBorders(scene);
