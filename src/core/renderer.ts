@@ -22,22 +22,16 @@ export namespace Renderer {
     export let vertexShader: WebGLShader;
     export let fragmentShader: WebGLShader;
 
-    export let positionBuffer: WebGLBuffer;
-    export let rotationBuffer: WebGLBuffer;
     export let normalBuffer: WebGLBuffer;
     export let vertexBuffer: WebGLBuffer;
-    export let scaleBuffer: WebGLBuffer;
     export let colorBuffer: WebGLBuffer;
 
     export let camPositionUniformLocation: WebGLUniformLocation;
     export let camRotationUniformLocation: WebGLUniformLocation;
 
-    export let positionGrid: Float32Array;
-    export let rotationGrid: Float32Array;
     export let normalGrid: Float32Array;
     export let vertexGrid: Float32Array;
     export let colorGrid: Float32Array;
-    export let scaleGrid: Float32Array;
 
     export let scene: Scene;
 
@@ -72,12 +66,9 @@ export namespace Renderer {
 
         const points = Renderer.scene.meshes.map((mesh) => mesh.triangles.length).reduce((a,b) => a+b) * 9;
 
-        Renderer.positionGrid = new Float32Array(points);
-        Renderer.rotationGrid = new Float32Array(points);
         Renderer.normalGrid = new Float32Array(points);
         Renderer.vertexGrid = new Float32Array(points);
         Renderer.colorGrid = new Float32Array(points);
-        Renderer.scaleGrid = new Float32Array(points);
 
         Renderer.setupWebGL();
 
@@ -127,15 +118,11 @@ export namespace Renderer {
 
         let i = 0;
 
-        const position_array = [];
-        const rotation_array = [];
         const normal_array = [];
         const points_array = [];
         const colors_array = [];
-        const scales_array = [];
 
         let rgb_normal: Color;
-        let tri_normal: Vec3;
         
         Renderer.gl.uniform3f(Renderer.camPositionUniformLocation, 
                 Renderer.scene.camera.transform.position.x,
@@ -149,35 +136,25 @@ export namespace Renderer {
 
 
         // Renderer.scene.meshes.sort((a, b) => a.getAvgZ() - b.getAvgZ());
-        let v21, v31;
 
         Renderer.scene.meshes.forEach((mesh) => {
+            mesh.updateTriangles(Renderer.scene.camera);
+
             mesh.triangles.forEach(tri=>{
-
-                v21 = vec3xVec3SubR(tri.points[1], tri.points[0]);
-                v31 = vec3xVec3SubR(tri.points[2], tri.points[0]);
-    
-                tri_normal = vec3Normal(vec3Cross(v21, v31));
                 rgb_normal = rgbNormal(tri.material);
-
-                tri.points.forEach(pt => {
+                if(tri.dProduct >= 0) return;
+                tri.cameraPoints.forEach(pt => {
                     ++i;
-                    position_array.push(mesh.transform.position.x, mesh.transform.position.y, mesh.transform.position.z);
-                    rotation_array.push(mesh.transform.rotation.x, mesh.transform.rotation.y, mesh.transform.rotation.z);
-                    scales_array.push(mesh.transform.scale.x, mesh.transform.scale.y, mesh.transform.scale.z);
                     colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b);
-                    normal_array.push(tri_normal.x, tri_normal.y, tri_normal.z);
+                    normal_array.push(tri.normal.x, tri.normal.y, tri.normal.z);
                     points_array.push(pt.x, pt.y, pt.z);
                 })
             });
         });
         
-        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.positionBuffer, new Float32Array(position_array));
-        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.rotationBuffer, new Float32Array(rotation_array));
         Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexBuffer, new Float32Array(points_array));
         Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.normalBuffer, new Float32Array(normal_array));
         Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorBuffer, new Float32Array(colors_array));
-        Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.scaleBuffer, new Float32Array(scales_array));
 
         Renderer.gl.drawArrays(Renderer.gl.TRIANGLES, 0, i);
 
@@ -253,12 +230,9 @@ export namespace Renderer {
             Renderer.webglProgram = Renderer.createProgram(Renderer.vertexShader, Renderer.fragmentShader);
 
             // TODO: DYNAMIC_DRAW
-            Renderer.positionBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.positionGrid, Renderer.gl.STATIC_DRAW, "a_position", 3, Renderer.gl.FLOAT);
-            Renderer.rotationBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.rotationGrid, Renderer.gl.STATIC_DRAW, "a_rotation", 3, Renderer.gl.FLOAT);
+            Renderer.vertexBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexGrid, Renderer.gl.STATIC_DRAW, "a_position", 3, Renderer.gl.FLOAT);
             Renderer.normalBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.normalGrid, Renderer.gl.STATIC_DRAW, "a_normal", 3, Renderer.gl.FLOAT);
-            Renderer.vertexBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexGrid, Renderer.gl.STATIC_DRAW, "a_point", 3, Renderer.gl.FLOAT);
             Renderer.colorBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorGrid, Renderer.gl.STATIC_DRAW, "a_color", 3, Renderer.gl.FLOAT);
-            Renderer.scaleBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.scaleGrid, Renderer.gl.STATIC_DRAW, "a_scale", 3, Renderer.gl.FLOAT);
 
             Renderer.camPositionUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_camPosition");
             Renderer.camRotationUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_camRotation");

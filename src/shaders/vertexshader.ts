@@ -5,10 +5,7 @@ precision mediump float;
 const int MAX_ITERATIONS = 6;
 
 attribute vec3 a_position;
-attribute vec3 a_point;
 attribute vec3 a_normal;
-attribute vec3 a_rotation;
-attribute vec3 a_scale;
 attribute vec3 a_color;
 
 uniform vec2 u_size;
@@ -35,20 +32,8 @@ vec3 rotate(vec3 point, vec3 rotation)
     return result;
 }
 
-vec3 meshTransformation()
-{
-    vec3 result = a_point * a_scale;
-    result = rotate(result, a_rotation);
-    result = result + a_position;
-
-
-    return result;
-}
-
 void main(void){
-    vec3 meshPosition = meshTransformation();
-
-    vec3 camTranslatedPoint = rotate(meshPosition - u_camPosition, -u_camRotation);
+    vec3 camTranslatedPoint = rotate(a_position - u_camPosition, -u_camRotation);
     
 
     if(camTranslatedPoint.z < 0.0001)
@@ -58,13 +43,11 @@ void main(void){
 
     vec2 uv = vec2(camTranslatedPoint.x / camTranslatedPoint.z, camTranslatedPoint.y / camTranslatedPoint.z);
 
-    vec3 normal = rotate(a_normal, a_rotation);
-
     float intensity = 0.0;
 
     for(int i = 0; i < MAX_ITERATIONS; i++) {
         if(i >= u_lightsCount){break;}
-        float dp = dot(normal, u_lights[i]);
+        float dp = dot(a_normal, u_lights[i]);
         if(dp >= 0.0){
             dp = 0.0;
         }else{
@@ -77,13 +60,6 @@ void main(void){
             break;
         }
     };
-
-    float dProduct = dot(normal, a_position - u_camPosition);
-
-    if(dProduct >= 0.0){
-        return;
-    };
-
 
     gl_Position = vec4(((u_f * uv + (u_size / 2.0)) / u_size) * 2.0 - 1.0, 0.5, 1.0);
     

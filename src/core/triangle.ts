@@ -12,8 +12,8 @@ export class Triangle {
     public material: Color;
 
     public cameraPoints: Array<Vec3>;
-    public afterLightMaterial: Color;
     public normal: Vec3;
+    public dProduct: number;
 
     constructor();
     constructor(p1: Vec3, p2: Vec3, p3: Vec3);

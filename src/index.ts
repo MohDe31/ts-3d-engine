@@ -12,6 +12,7 @@ import { BallCollisionHandler } from "./scripts/collisions";
 import { Cue } from "./scripts/cue";
 import { Vec2 } from "./utils/vecUtils";
 import { Renderer } from "./core/renderer";
+import { SphereVisualization } from "./scripts/sphereVisualization";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2) {
@@ -124,6 +125,22 @@ window.onload = function () {
 
     // Creating a light for the scene
     scene.lights.push(new Light(1, {x: 0,y: 1, z: 0}, {x: Math.PI / 5, y: 0, z: 0}));//{x: Math.PI / 2, y: 0, z: 0}));
+
+
+
+    const cube: GameObject = new GameObject();
+    let mesh: Mesh = (cube.addComponent(Mesh) as Mesh);
+    mesh.triangles = cubeTriangles(8);
+    mesh.triangles.forEach(tri => tri.material = {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b:(Math.random() * 255) >> 0 });
+
+    cube.transform.scale.x = 5;
+    cube.transform.scale.y = 5;
+    cube.transform.scale.z = 5;
+
+    cube.transform.position = {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) + 3};
+    cube.addComponent(SphereVisualization);
+
+    scene.addGameObject(cube);
 
 
     // Initialize a renderer

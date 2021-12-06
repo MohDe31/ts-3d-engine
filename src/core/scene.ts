@@ -56,12 +56,4 @@ export default class Scene {
         // this.meshes.sort((a, b) => b.getAvgZ() - a.getAvgZ());
 
     }
-    
-    //TODO: this should be undefined
-    drawScene(ctx: CanvasRenderingContext2D) {
-        // Draw all the meshes
-        for(let i = 0; i < this.meshes.length; i+=1) {
-            this.meshes[i].draw(ctx, this.camera, this.lights);
-        }
-    }
 }
