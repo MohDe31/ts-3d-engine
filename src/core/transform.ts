@@ -15,14 +15,14 @@ export class Transform extends Component {
     public sin: Vec3;
 
     // Change to a vec3
-    public scale: number;
+    public scale: Vec3;
 
     constructor(gameObject: GameObject){
         super(gameObject);
 
         this.position = {x: 0, y: 0, z: 0};
         this.rotation = {x: 0, y: 0, z: 0};
-        this.scale   = 1;
+        this.scale    = {x: 1, y: 1, z: 1};
 
         this.cos = { x: 0, y: 0, z: 0 };
         

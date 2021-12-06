@@ -13,6 +13,7 @@ export class Triangle {
     public cameraPoints: Array<Vec3>;
     public normal: Vec3;
 
+    constructor();
     constructor(p1: Vec3, p2: Vec3, p3: Vec3);
     constructor(p1: Vec3, p2: Vec3, p3: Vec3, material: Color);
     constructor(p1?: Vec3, p2?: Vec3, p3?: Vec3, material?: Color) {

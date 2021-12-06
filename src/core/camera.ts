@@ -14,8 +14,7 @@ export class Camera extends GameObject {
     constructor(scene: Scene, position: Vec3, rotation: Vec3);
     constructor(scene: Scene, position?: Vec3, rotation?: Vec3) {
 
-        super(position || {x: 0, y: 0, z: 0},
-              rotation || {x: 0, y: 0, z: 0});
+        super(position, rotation);
 
         this.config = cameraProjectionConfig;
         this.scene = scene;
@@ -35,7 +34,8 @@ export class Camera extends GameObject {
 
         let { x, y } = this.getCenterUV();
 
-        if(camPoints.z <= 0) return undefined;
+        if(camPoints.z == 0) camPoints.z = 0.00001;//return undefined;
+        else if(camPoints.z < 0 ) return undefined;
 
         let xz = camPoints.x / camPoints.z;
         let yz = camPoints.y / camPoints.z;

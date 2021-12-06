@@ -1,7 +1,7 @@
 import { Component } from "../core/component";
 import GameObject from "../core/gameobject";
 import { RigidBody2D } from "../core/rigidbody";
-import { Vec2, vec2Dot, vec2Magnitude, vec2Normal, vec2xNumMulR, vec2xVec2Add, vec2xVec2AddR, vec2xVec2SubR } from "../utils/vecUtils";
+import { Vec2, vec2Dot, vec2Magnitude, vec2Normal, vec2xNumMulR, vec2xVec2AddR, vec2xVec2SubR } from "../utils/vecUtils";
 
 
 export class Ball extends Component {

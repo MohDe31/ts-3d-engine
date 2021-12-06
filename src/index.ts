@@ -1,13 +1,11 @@
 import Scene from "./core/scene";
-import { parseObj } from "./utils/objParser";
-import { join } from "path";
 import { Light } from "./core/light";
 import { Camera } from "./core/camera";
 import Mesh from "./core/mesh";
 import { Triangle } from "./core/triangle";
 import { Ball } from "./scripts/ball";
 import GameObject from "./core/gameobject";
-import { sphereTriangles } from "./core/primitive";
+import { cubeTriangles, sphereTriangles } from "./core/primitive";
 import { RigidBody2D } from "./core/rigidbody";
 import { Renderer } from "./core/renderer";
 import { CameraMovements } from "./scripts/cameraMovements";
@@ -28,6 +26,22 @@ function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler
     sphere.transform.position.z = position.y;
 }
 
+
+function makeBorders(scene: Scene) {
+    const leftBorder: GameObject = new GameObject();
+    const mesh: Mesh = leftBorder.addComponent(Mesh) as Mesh;
+
+    mesh.triangles = cubeTriangles(1);
+    mesh.triangles.forEach(tri => tri.material = { r: 255, g: 0, b: 0 });
+
+
+    leftBorder.transform.position.y = 4;
+    leftBorder.transform.scale.z = 80;
+
+    scene.addGameObject(leftBorder);
+
+}
+
 function initializeBalls(scene: Scene, camera: Camera) {
     
     const spheres: Array<GameObject> = new Array<GameObject>(16);
@@ -41,14 +55,14 @@ function initializeBalls(scene: Scene, camera: Camera) {
     for(let j = i; j < 5; j+=1) {
         const sphere: GameObject = new GameObject();
 
-        makeBall(sphere, ballCollisionHandler, {x: i * 2, y: j});
+        makeBall(sphere, ballCollisionHandler, {x: (j * 2) - i, y: i * 2});
 
         spheres[i * 5 + (j - i)] = sphere;
         scene.addGameObject(sphere);
     }
 
     const whiteSphere: GameObject = new GameObject();
-    makeBall(whiteSphere, ballCollisionHandler, {x: 2.5, y: 50});
+    makeBall(whiteSphere, ballCollisionHandler, {x: 5, y: 50});
     
     scene.addGameObject(whiteSphere);
 
@@ -64,15 +78,11 @@ function createFloor(floor_x: number, floor_z: number): GameObject {
     const floor : GameObject = new GameObject();
     const floorMesh: Mesh = floor.addComponent(Mesh) as Mesh;
 
-    for(let i = 0; i < floor_x; i+=1)
-    for(let j = 0; j < floor_z; j+=1) {
-        let c_ = (i+j)%2 == 1 ? 255 : 0;
-        floorMesh.triangles.push(
-            new Triangle({x: i + 1, y: 0, z: j + 1}, {x: i + 1, y: 0, z: j}, {x: i, y: 0, z: j}, {r: c_, g: c_, b: c_}),
-            new Triangle({x: i, y: 0, z: j + 1}, {x: i + 1, y: 0, z: j + 1}, {x: i, y: 0, z: j}, {r: c_, g: c_, b: c_}),
-        )
-    }
-
+    floorMesh.triangles.push(
+        new Triangle({x: floor_x, y: 0, z: floor_z}, {x: floor_x, y: 0, z: 0}, {x: 0, y: 0, z: 0}, {r: 0, g: 255, b: 0}),
+        new Triangle({x: 0, y: 0, z: floor_z}, {x: floor_x, y: 0, z: floor_z}, {x: 0, y: 0, z: 0}, {r: 0, g: 255, b: 0}),
+    )
+    
     return floor;
 }
 
@@ -81,36 +91,29 @@ window.onload = function () {
 
     // Creating a scene
     const scene : Scene = new Scene();
+    const FLOORX: number = 40;
+    const FLOORZ: number = FLOORX * 2;
 
     //#region Floor Creation
-    /*
-    const FLOORX: number = 25;
-    const FLOORZ: number = 25;
 
     const floor: GameObject = createFloor(FLOORX, FLOORZ);
+    floor.transform.position = {
+        x: -(FLOORX / 2) + 5,
+        y: 0,
+        z: -(FLOORZ / 4)
+    }
     scene.addGameObject(floor);
-    */
-    //#endregion
-    
-    //#region Table loading
-    /*
-    const table : GameObject = parseObj(join(__dirname, "/assets/bill-table.obj"));
-
-    // Initializing the table position
-    table.transform.position  = { x: (FLOORX / 2) >> 0,
-                        y: 1,
-                        z: (FLOORZ / 2) >> 0};
-
-    scene.addGameObject(table );
-    */
+  
     //#endregion
 
     // Creating a camera for the scene
-    scene.camera = new Camera(scene);//, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5},  {x: Math.PI / 5, y: 0, z: 0});
+    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5});//,  {x: Math.PI / 5, y: 0, z: 0});
     scene.camera.addComponent(CameraMovements);
     scene.addGameObject(scene.camera);
 
 
+
+    makeBorders(scene);
 
 
     //Making spheres

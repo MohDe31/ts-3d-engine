@@ -1,5 +1,5 @@
 import { Color, HSVColor, hsvToRgb, rgbToHsv, rgbToString } from "../utils/color";
-import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3SqrMagnitude, vec3xNumDivR, vec3xNumMulR, vec3xVec3AddR, vec3xVec3SubR } from "../utils/vecUtils";
+import { Vec2, Vec3, vec3Cross, vec3Dot, vec3Normal, vec3SqrMagnitude, vec3xNumDivR, vec3xNumMulR, vec3xVec3AddR, vec3xVec3MulR, vec3xVec3SubR } from "../utils/vecUtils";
 import { Camera } from "./camera";
 import { Component } from "./component";
 import { rotateCs } from "./engine";
@@ -52,10 +52,13 @@ export default class Mesh extends Component {
         let hsvMaterial: HSVColor;
 
         let lightIntensity: number;
+
         // ------------------------------------------------------------------------------------------
 
         // Calculating the normal of every light source in the scene TODO: move this to the drawScene renderer
         const lightNormalArr: Array<Vec3> = lights.map(light => light.transform.forward());
+
+        const cameraForward: Vec3 = camera.transform.forward();
 
         // An array to store the visible triangles
         const drawingTriangle: Array<Triangle> = new Array<Triangle>();
@@ -66,9 +69,9 @@ export default class Mesh extends Component {
             triangle = this.triangles[i];
 
             // Scaling the triangle // TODO: Make this a precalculated attribute for optimization
-            scaled_1 = vec3xNumMulR(triangle.points[0], this.transform.scale);
-            scaled_2 = vec3xNumMulR(triangle.points[1], this.transform.scale);
-            scaled_3 = vec3xNumMulR(triangle.points[2], this.transform.scale);
+            scaled_1 = vec3xVec3MulR(triangle.points[0], this.transform.scale);
+            scaled_2 = vec3xVec3MulR(triangle.points[1], this.transform.scale);
+            scaled_3 = vec3xVec3MulR(triangle.points[2], this.transform.scale);
 
 
             // Rotating the triangle points
@@ -99,13 +102,18 @@ export default class Mesh extends Component {
             
             // triangle average Z is the minimum between the points distance from the camera
             // using the (distance^2) to avoid the sqrt calculating as it takes more time to calculate
-            triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.transform.position)),
+            /*triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.transform.position)),
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.transform.position)),
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.transform.position)));
+            */
+            // TODO: A temporary fix
+            triangle.avgZ = Math.min(vec3xVec3SubR(translated_1, camera.transform.position).y,
+                                     vec3xVec3SubR(translated_2, camera.transform.position).y,
+                                     vec3xVec3SubR(translated_3, camera.transform.position).y);
 
 
             // if the DotProduct between normal and the cam - center
-            // is less than 0, it means the triangle is behind the camera
+            // is less than 0, it means the triangle is facing the same direction as the camera
             if (dProduct < 0) {
                 
                 triangle.normal = norm;

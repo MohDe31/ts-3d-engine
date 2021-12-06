@@ -1,5 +1,7 @@
 // Vector calculations and utilities
 
+import { Triangle } from "../core/triangle";
+
 
 export type Vec2 = {
     x: number,
@@ -35,6 +37,14 @@ export function vec3xVec3AddR(v1: Vec3, v2: Vec3): Vec3 {
         x: v1.x + v2.x,
         y: v1.y + v2.y,
         z: v1.z + v2.z,
+    }
+}
+
+export function vec3xVec3MulR(v1: Vec3, v2: Vec3): Vec3 {
+    return {
+        x: v1.x * v2.x,
+        y: v1.y * v2.y,
+        z: v1.z * v2.z,
     }
 }
 
