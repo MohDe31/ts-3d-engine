@@ -137,7 +137,13 @@ export namespace Renderer {
 
         // Renderer.scene.meshes.sort((a, b) => a.getAvgZ() - b.getAvgZ());
 
+        // TODO: Turn this into a for loop
         Renderer.scene.meshes.forEach((mesh) => {
+            
+            if(!mesh.gameObject.active)return;
+
+
+
             mesh.updateTriangles(Renderer.scene.camera);
 
             mesh.triangles.forEach(tri=>{

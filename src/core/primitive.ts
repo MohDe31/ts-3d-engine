@@ -75,3 +75,40 @@ export function sphereTriangles(resolution: number): Array<Triangle> {
     return triangles;
 }
 
+export function quadTriangles(resolution: number): Array<Triangle> {
+
+    const triangles: Array<Triangle> = new Array<Triangle>();
+
+    let step = 1 / resolution;
+
+    for(let i = 0; i < resolution; i+=1)
+    for(let j = 0; j < resolution; j+=1) {
+        triangles.push(
+            //TOP
+            new Triangle({x: step * i, y: 0, z: step * j}, {x: step * i, y: 0, z: step + step * j}, {x: step + step * i, y: 0, z: step * j}),
+            new Triangle({x: step * i, y: 0, z: step + step * j}, {x: step + step * i, y: 0, z: step + step * j}, {x: step + step * i, y: 0, z: step * j}),
+        );
+    }
+
+    for(let i = 0; i < triangles.length; i+=1) {
+        vec3xVec3Sub(triangles[i].points[0], {x: .5, y: 0, z: .5});
+        vec3xVec3Sub(triangles[i].points[1], {x: .5, y: 0, z: .5});
+        vec3xVec3Sub(triangles[i].points[2], {x: .5, y: 0, z: .5});
+    }
+
+    return triangles;
+}
+
+
+export function circleTriangles(resolution: number): Array<Triangle> {
+
+    const triangles: Array<Triangle> = quadTriangles(resolution);
+
+    for(let i = 0; i < triangles.length; i+=1) {
+        vec3Normalize(triangles[i].points[0]);
+        vec3Normalize(triangles[i].points[1]);
+        vec3Normalize(triangles[i].points[2]);
+    }
+
+    return triangles;
+}

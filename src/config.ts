@@ -5,7 +5,7 @@ export const config: WorldSettings = {
 };
 
 export const cameraProjectionConfig: CameraProjectionSettings = {
-    F: 500,
+    F: 800,
     ALPHA: 1,
     BETA: 1
 }

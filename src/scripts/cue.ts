@@ -3,6 +3,7 @@ import { Component } from "../core/component";
 import { Vec3, vec3Normal, vec3xVec3SubR } from "../utils/vecUtils";
 import { Mouse } from "../core/mouse";
 import { RigidBody2D } from "../core/rigidbody";
+import { Time } from "../core/time";
 
 export class Cue extends Component {
     
@@ -17,9 +18,9 @@ export class Cue extends Component {
         const dir: Vec3 = vec3Normal(vec3xVec3SubR(this.whiteBall.position, this.camera.position));
 
         if(Mouse.GetKeyDown(0)){
-            this.whiteBallRigid.addForce({x: dir.x, y: dir.z});
+            this.whiteBallRigid.addForce({x: dir.x * Time.FixedDeltaTime, y: dir.z * Time.FixedDeltaTime});
         }else if(Mouse.GetKeyDown(2)){
-            this.whiteBallRigid.addForce({x: -dir.x, y: -dir.z});
+            this.whiteBallRigid.addForce({x: -dir.x * Time.FixedDeltaTime, y: -dir.z * Time.FixedDeltaTime});
         }
 
     }

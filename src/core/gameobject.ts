@@ -6,6 +6,7 @@ import { Vec3, vec3Set } from "../utils/vecUtils";
 export default class GameObject {
     private components: Array<Component>;
     public transform: Transform;
+    public active: boolean;
 
     constructor();
     constructor(position: Vec3, rotation: Vec3);
@@ -17,6 +18,8 @@ export default class GameObject {
     
         vec3Set(this.transform.position, position || {x: 0, y: 0, z: 0});
         vec3Set(this.transform.rotation, rotation || {x: 0, y: 0, z: 0});
+
+        this.active = true;
     }
 
     update(){

@@ -11,6 +11,8 @@ export class Ball extends Component {
     public potted: boolean;
     public radius: number;
 
+    public onPot: Function;
+
     constructor(gameObject: GameObject) {
         super(gameObject);
         
@@ -19,7 +21,11 @@ export class Ball extends Component {
         this.rigidBody = this.gameObject.getComponent(RigidBody2D) as RigidBody2D;
     }
 
-    pot() { this.potted = true; }
+    pot() { 
+        this.potted = true; 
+
+        this.onPot(this);
+    }
 
     get2DPosition(): Vec2 {
         return {
@@ -44,11 +50,11 @@ export class Ball extends Component {
 
         const unmtd: Vec2 = vec2xNumMulR(un, mtd);
 
-        this.transform.position.x += unmtd.x;
-        this.transform.position.z += unmtd.y;
+        this.transform.position.x += (unmtd.x * 1.1);
+        this.transform.position.z += (unmtd.y * 1.1);
 
-        ball.transform.position.x -= unmtd.x;
-        ball.transform.position.z -= unmtd.y;
+        ball.transform.position.x -= (unmtd.x * 1.1);
+        ball.transform.position.z -= (unmtd.y * 1.1);
 
         // tangent vector
         const ut: Vec2 = {x: -un.y,

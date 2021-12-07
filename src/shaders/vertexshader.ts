@@ -61,7 +61,7 @@ void main(void){
         }
     };
 
-    gl_Position = vec4(((u_f * uv + (u_size / 2.0)) / u_size) * 2.0 - 1.0, 0.5, 1.0);
+    gl_Position = vec4(((u_f * uv + (u_size / 2.0)) / u_size) * 2.0 - 1.0, 0.0, 1.0);
     
     v_color = a_color * intensity;
 }

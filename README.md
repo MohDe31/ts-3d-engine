@@ -3,16 +3,12 @@
 
 To run, first you need to build the project using:
 
-yarn:
-    -   yarn build 
+## Running the engine
 
-npm:
-    -   npm run build
+### Using npm
 
-and then run using:
+    npm run build && npm run start
 
-yarn:
-    -   yarn start
+### Using yarn
 
-npm:
-    -   npm run start
+    yarn build && yarn start

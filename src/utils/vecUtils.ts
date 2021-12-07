@@ -104,9 +104,6 @@ export function vec3Cross(v1: Vec3, v2: Vec3): Vec3 {
     }
 }
 
-
-
-
 export function vec2Set(v1: Vec2, x: number, y: number) {
     v1.x = x;
     v1.y = y;
@@ -163,3 +160,4 @@ export function vec2Normal(vec: Vec2): Vec2 {
 export function vec2Dot(v1: Vec2, v2: Vec2): number {
     return v1.x * v2.x + v1.y * v2.y;
 }
+
