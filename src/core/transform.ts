@@ -3,9 +3,7 @@ import { Component } from "./component";
 import { rotate } from "./engine";
 import GameObject from "./gameobject";
 
-
-
-
+// The transform component is essential to every GameObject, so its always auto created when a new GameObject.
 export class Transform extends Component {
 
     public position: Vec3;

@@ -5,7 +5,11 @@ import Scene from "./scene";
 import { FRAGMENT_SHADER } from "../shaders/fragmentshader";
 import { VERTEX_SHADER } from "../shaders/vertexshader";
 import { Color, rgbNormal } from "../utils/color";
-import { Vec3, vec3Cross, vec3Normal, vec3xVec3SubR } from "../utils/vecUtils";
+import { Vec3 } from "../utils/vecUtils";
+import Mesh from "./mesh";
+import { Triangle } from "./triangle";
+
+
 
 export namespace Renderer {
     export let initialized: boolean;
@@ -25,6 +29,8 @@ export namespace Renderer {
     export let normalBuffer: WebGLBuffer;
     export let vertexBuffer: WebGLBuffer;
     export let colorBuffer: WebGLBuffer;
+
+    export let clearColor: Color = {r: 0, g: 0, b: 0};
 
     export let camPositionUniformLocation: WebGLUniformLocation;
     export let camRotationUniformLocation: WebGLUniformLocation;
@@ -72,10 +78,6 @@ export namespace Renderer {
 
         Renderer.setupWebGL();
 
-        // setDraggable(Renderer.canvas, Renderer.scene.onMouseDrag, Renderer.scene);
-
-        var self = Renderer;
-
         // ----------Initializing key listeners-------------
         document.onkeydown = function (e: KeyboardEvent) {
             Keyboard.KeyHandler(e);
@@ -98,7 +100,11 @@ export namespace Renderer {
         /**
          *
          */
-        Renderer.setClearColor(0, 0, 0, 0);
+        
+        Renderer.clearColor = rgbNormal(Renderer.clearColor);
+        Renderer.gl.clearColor(Renderer.clearColor.r,
+                               Renderer.clearColor.g,
+                               Renderer.clearColor.b, 1.0);
 
         requestAnimationFrame(Renderer.render);
     }
@@ -113,7 +119,9 @@ export namespace Renderer {
         Renderer.scene.update();
 
         // Renderer.scene.updateScene(Renderer.time.dt / 1000);
-        Renderer.gl.clear(Renderer.gl.COLOR_BUFFER_BIT);
+        Renderer.gl.depthFunc(Renderer.gl.LEQUAL);
+        Renderer.gl.clearDepth(1.0);
+        Renderer.gl.clear(Renderer.gl.COLOR_BUFFER_BIT | Renderer.gl.DEPTH_BUFFER_BIT);
         // Renderer.scene.update();
 
         let i = 0;
@@ -122,7 +130,10 @@ export namespace Renderer {
         const points_array = [];
         const colors_array = [];
 
+        const camForward: Vec3 = Renderer.scene.camera.transform.forward();
+
         let rgb_normal: Color;
+
         
         Renderer.gl.uniform3f(Renderer.camPositionUniformLocation, 
                 Renderer.scene.camera.transform.position.x,
@@ -134,28 +145,27 @@ export namespace Renderer {
                 Renderer.scene.camera.transform.rotation.y,
                 Renderer.scene.camera.transform.rotation.z);
 
+        const triangles: Array<Triangle> = new Array<Triangle>();
 
-        // Renderer.scene.meshes.sort((a, b) => a.getAvgZ() - b.getAvgZ());
-
-        // TODO: Turn this into a for loop
-        Renderer.scene.meshes.forEach((mesh) => {
-            
-            if(!mesh.gameObject.active)return;
-
-
-
+        Renderer.scene.meshes.forEach(function(mesh: Mesh){
             mesh.updateTriangles(Renderer.scene.camera);
 
-            mesh.triangles.forEach(tri=>{
-                rgb_normal = rgbNormal(tri.material);
-                if(tri.dProduct >= 0) return;
-                tri.cameraPoints.forEach(pt => {
-                    ++i;
-                    colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b);
-                    normal_array.push(tri.normal.x, tri.normal.y, tri.normal.z);
-                    points_array.push(pt.x, pt.y, pt.z);
-                })
-            });
+            triangles.push(...mesh.triangles.filter(function(triangle: Triangle){
+                return triangle.dProduct < 0;
+            }));
+        });
+
+
+        triangles.sort((b, a) => a.avgZ - b.avgZ);
+
+        triangles.forEach(function(triangle: Triangle) {
+            rgb_normal = rgbNormal(triangle.material);
+            triangle.cameraPoints.forEach(pt => {
+                ++i;
+                colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b);
+                normal_array.push(triangle.normal.x, triangle.normal.y, triangle.normal.z);
+                points_array.push(pt.x, pt.y, pt.z);
+            })
         });
         
         Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexBuffer, new Float32Array(points_array));
@@ -269,7 +279,9 @@ export namespace Renderer {
         return Renderer.canvas.getBoundingClientRect();
     }
 
-    export function setClearColor(r: number, g: number, b: number, a?: number) {
-        Renderer.gl.clearColor(r, g, b, a || 1.0);
+    export function setClearColor(r: number, g: number, b: number) {
+        Renderer.clearColor.r = r;
+        Renderer.clearColor.g = g;
+        Renderer.clearColor.b = b;
     }
 }

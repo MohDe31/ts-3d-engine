@@ -3,8 +3,6 @@ import { Camera } from "./camera";
 import GameObject from "./gameobject";
 import { Light } from "./light";
 import Mesh from "./mesh";
-import { Keyboard } from "./keyboard";
-import { vec3xNumMulR, vec3xVec3Add } from "../utils/vecUtils";
 
 export default class Scene {
     private gameObjects: Array<GameObject>;

@@ -2,7 +2,10 @@ import { Transform } from "./transform";
 import { Component } from "./component";
 import { Vec3, vec3Set } from "../utils/vecUtils";
 
-
+/**
+ * The GameObject class is every object in the game, even if it has no mesh, its the core of the object,
+ * it contains components to populate it
+ */
 export default class GameObject {
     private components: Array<Component>;
     public transform: Transform;

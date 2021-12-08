@@ -32,6 +32,7 @@ export default class Mesh extends Component {
         return dotProduct >= 0 ? 0 : -dotProduct;
     }
 
+    // Almost all of the previous calculations were taken to the GPU
     updateTriangles(camera: Camera) {
         // Calculate the cos, sin of the mesh to avoid recalculating
         this.gameObject.transform.calculateCs();
@@ -98,10 +99,10 @@ export default class Mesh extends Component {
 
             // triangle average Z is the minimum between the points distance from the camera
             // using the (distance^2) to avoid the sqrt calculating as it takes more time to calculate
-            /*triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.transform.position)),
+            triangle.avgZ = Math.min(vec3SqrMagnitude(vec3xVec3SubR(translated_1, camera.transform.position)),
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_2, camera.transform.position)),
                                      vec3SqrMagnitude(vec3xVec3SubR(translated_3, camera.transform.position)));
-            */
+            
             // TODO: A temporary fix
             /* triangle.avgZ = Math.min(vec3xVec3SubR(translated_1, camera.transform.position).y,
                                      vec3xVec3SubR(translated_2, camera.transform.position).y,

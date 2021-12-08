@@ -10,7 +10,7 @@ import { RigidBody2D } from "./core/rigidbody";
 import { CameraMovements } from "./scripts/cameraMovements";
 import { BallCollisionHandler } from "./scripts/collisions";
 import { Cue } from "./scripts/cue";
-import { Vec2, vec3Set } from "./utils/vecUtils";
+import { Vec2 } from "./utils/vecUtils";
 import { Renderer } from "./core/renderer";
 import { SphereVisualization } from "./scripts/sphereVisualization";
 
@@ -99,10 +99,13 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
 function createFloor(floor_x: number, floor_z: number): GameObject {
     const floor : GameObject = new GameObject();
     const floorMesh: Mesh = floor.addComponent(Mesh) as Mesh;
+    const res = 2;
 
+    for(let i = 0; i < floor_x; i+=res)
+    for(let j = 0; j < floor_z; j+=res)
     floorMesh.triangles.push(
-        new Triangle({x: floor_x, y: 0, z: floor_z}, {x: floor_x, y: 0, z: 0}, {x: 0, y: 0, z: 0}, {r: 0, g: 255, b: 0}),
-        new Triangle({x: 0, y: 0, z: floor_z}, {x: floor_x, y: 0, z: floor_z}, {x: 0, y: 0, z: 0}, {r: 0, g: 255, b: 0}),
+        new Triangle({x: i + res, y: 0, z: j + res}, {x: i + res, y: 0, z: j}, {x: i, y: 0, z: j}, {r: 0, g: (Math.random() * 255) >> 0, b: 0}),
+        new Triangle({x: i, y: 0, z: j + res}, {x: i + res, y: 0, z: j + res}, {x: i, y: 0, z: j}, {r: 0, g: (Math.random() * 255) >> 0, b: 0}),
     )
     
     return floor;
@@ -263,6 +266,9 @@ window.onload = function () {
     scene.addGameObject(cube);
 
 
+    Renderer.setClearColor(50, 50, 50);
+
     // Initialize a renderer
     Renderer.init(scene, "app", { showfps: true });
+    
 };

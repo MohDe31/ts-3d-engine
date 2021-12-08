@@ -1,5 +1,4 @@
 import { Component } from "../core/component";
-import GameObject from "../core/gameobject";
 import { Keyboard } from "../core/keyboard";
 import { Time } from "../core/time";
 import { vec3xNumMulR, vec3xVec3Add } from "../utils/vecUtils";

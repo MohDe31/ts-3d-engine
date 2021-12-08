@@ -98,17 +98,3 @@ export function quadTriangles(resolution: number): Array<Triangle> {
 
     return triangles;
 }
-
-
-export function circleTriangles(resolution: number): Array<Triangle> {
-
-    const triangles: Array<Triangle> = quadTriangles(resolution);
-
-    for(let i = 0; i < triangles.length; i+=1) {
-        vec3Normalize(triangles[i].points[0]);
-        vec3Normalize(triangles[i].points[1]);
-        vec3Normalize(triangles[i].points[2]);
-    }
-
-    return triangles;
-}
