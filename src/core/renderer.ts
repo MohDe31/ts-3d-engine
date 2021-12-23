@@ -14,8 +14,6 @@ import { Triangle } from "./triangle";
 export namespace Renderer {
     export let initialized: boolean;
 
-    export let rendererSettings: RendererSettings;
-
     export let others: Object;
 
     export let canvas: HTMLCanvasElement;
@@ -39,28 +37,31 @@ export namespace Renderer {
     export let vertexGrid: Float32Array;
     export let colorGrid: Float32Array;
 
+    export let debugContent: Array<DebugContent>;
+
     export let scene: Scene;
 
-    export function init(scene: Scene, canvas_id?: string, settings?: RendererSettings) {
+    export function init(scene: Scene, canvas_id?: string, ...debugContent: Array<DebugContent>) {
         if (Renderer.initialized) {
             alert("A renderer instance already exists");
             return;
         }
 
+        Renderer.debugContent = debugContent;
 
-        Renderer.rendererSettings = settings;
         Renderer.others = new Object();
 
         Renderer.scene = scene;
 
         Renderer.loadCanvas(canvas_id);
-        if (Renderer.rendererSettings?.showfps) {
-            let container = Renderer.canvas.parentElement;
-            let fpsdiv = document.createElement("div");
-            fpsdiv.classList.add("fps");
-            container.appendChild(fpsdiv);
-            Renderer.others["fpsdiv"] = fpsdiv;
-        }
+
+        Renderer.others["fpsdiv"] = document.querySelector("#fps");
+        Renderer.others["debug-console"] = document.querySelector("#debug-list");
+        for(let i = 0; i < debugContent.length; i+=1){
+            Renderer.others[i] = document.createElement('li');
+            Renderer.others["debug-console"].appendChild(Renderer.others[i]);
+        };
+
 
         // @ts-ignore
         Renderer.gl = Renderer.canvas.getContext("webgl");
@@ -111,26 +112,33 @@ export namespace Renderer {
 
     export function render(time: number) {
         Time.updateDeltaTime(time);
-        if (Renderer.rendererSettings?.showfps) {
-            Renderer.others["fpsdiv"].innerHTML = Time.FPS;
-        }
+        
+        Renderer.others["fpsdiv"].innerHTML = `FPS: ${Time.FPS}`;
+        for(let i = 0; i < Renderer.debugContent.length; i+=1) {
+            const content: DebugContent = Renderer.debugContent[i];
 
+            if(content.message) Renderer.others[i].innerText = `${content.message}: `;
+            else Renderer.others[i].innerText = "";
+        
+            switch(content.type){
+                case "VEC3":
+                    Renderer.others[i].innerText += `${content.object.x.toFixed(2)} ${content.object.y.toFixed(2)} ${content.object.z.toFixed(2)}`;
+                    break;
+            }
+        }
+        
+        
+        
 
         Renderer.scene.update();
 
-        // Renderer.scene.updateScene(Renderer.time.dt / 1000);
-        Renderer.gl.depthFunc(Renderer.gl.LEQUAL);
-        Renderer.gl.clearDepth(1.0);
-        Renderer.gl.clear(Renderer.gl.COLOR_BUFFER_BIT | Renderer.gl.DEPTH_BUFFER_BIT);
-        // Renderer.scene.update();
+        Renderer.gl.clear(Renderer.gl.COLOR_BUFFER_BIT );
 
         let i = 0;
 
         const normal_array = [];
         const points_array = [];
         const colors_array = [];
-
-        const camForward: Vec3 = Renderer.scene.camera.transform.forward();
 
         let rgb_normal: Color;
 

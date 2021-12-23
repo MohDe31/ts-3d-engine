@@ -2,3 +2,4 @@ node_modules
 compile
 src/common/draggable.ts
 yarn*
+pnpm-lock*

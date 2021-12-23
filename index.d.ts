@@ -10,6 +10,8 @@ declare interface CameraProjectionSettings {
     BETA: number
 }
 
-declare interface RendererSettings {
-    showfps?: boolean;
+declare interface DebugContent {
+    type: "VEC3",
+    message?: string,
+    object: any
 }

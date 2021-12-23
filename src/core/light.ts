@@ -1,4 +1,4 @@
-import { Vec3, vec3Set } from "../utils/vecUtils";
+import { Vec3 } from "../utils/vecUtils";
 import GameObject from "./gameobject";
 
 

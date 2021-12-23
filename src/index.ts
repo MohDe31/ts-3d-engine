@@ -2,7 +2,6 @@ import Scene from "./core/scene";
 import { Light } from "./core/light";
 import { Camera } from "./core/camera";
 import Mesh from "./core/mesh";
-import { Triangle } from "./core/triangle";
 import { Ball } from "./scripts/ball";
 import GameObject from "./core/gameobject";
 import { cubeTriangles, sphereTriangles } from "./core/primitive";
@@ -10,9 +9,11 @@ import { RigidBody2D } from "./core/rigidbody";
 import { CameraMovements } from "./scripts/cameraMovements";
 import { BallCollisionHandler } from "./scripts/collisions";
 import { Cue } from "./scripts/cue";
-import { Vec2 } from "./utils/vecUtils";
+import { Vec2, vec3xNumMulR } from "./utils/vecUtils";
 import { Renderer } from "./core/renderer";
 import { SphereVisualization } from "./scripts/sphereVisualization";
+import { parseObj } from "./utils/objParser";
+import { join } from "path";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function) {
@@ -28,22 +29,6 @@ function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler
 
     sphere.transform.position.x = position.x;
     sphere.transform.position.z = position.y;
-}
-
-
-function makeBorders(scene: Scene) {
-    const leftBorder: GameObject = new GameObject();
-    const mesh: Mesh = leftBorder.addComponent(Mesh) as Mesh;
-
-    mesh.triangles = cubeTriangles(1);
-    mesh.triangles.forEach(tri => tri.material = { r: 255, g: 0, b: 0 });
-
-
-    leftBorder.transform.position.y = 4;
-    leftBorder.transform.scale.z = 80;
-
-    scene.addGameObject(leftBorder);
-
 }
 
 function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z: number) {
@@ -62,7 +47,7 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
 
         makeBall(sphere, 
                  ballCollisionHandler, 
-                 {x: (j * 2) - i + ((floor_x >> 1)-4), y: i * 2 + 10},
+                 {x: (j * 2) - i - 4, y: i * 2 - ((floor_z >> 1) - 10)},
                  (ball: Ball) => {
                      ball.gameObject.active = false;
                  });
@@ -76,7 +61,7 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     
     makeBall(whiteSphere,
              ballCollisionHandler,
-             {x: floor_x >> 1, y: floor_z - (floor_z >> 2)},
+             {x: 0, y: (floor_z >> 2)},
              (ball: Ball) => {
                  ball.transform.position.x = floor_x >> 1;
                  ball.transform.position.z = floor_z - (floor_z >> 2);
@@ -93,22 +78,6 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     cue.whiteBallRigid = ballCollisionHandler.balls[ballCollisionHandler.balls.length - 1].rigidBody;
 
     makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
-}
-
-
-function createFloor(floor_x: number, floor_z: number): GameObject {
-    const floor : GameObject = new GameObject();
-    const floorMesh: Mesh = floor.addComponent(Mesh) as Mesh;
-    const res = 2;
-
-    for(let i = 0; i < floor_x; i+=res)
-    for(let j = 0; j < floor_z; j+=res)
-    floorMesh.triangles.push(
-        new Triangle({x: i + res, y: 0, z: j + res}, {x: i + res, y: 0, z: j}, {x: i, y: 0, z: j}, {r: 0, g: (Math.random() * 255) >> 0, b: 0}),
-        new Triangle({x: i, y: 0, z: j + res}, {x: i + res, y: 0, z: j + res}, {x: i, y: 0, z: j}, {r: 0, g: (Math.random() * 255) >> 0, b: 0}),
-    )
-    
-    return floor;
 }
 
 function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, floor_x: number, floor_z: number) {
@@ -226,8 +195,7 @@ window.onload = function () {
 
     //#region Floor Creation
 
-    const floor: GameObject = createFloor(FLOORX, FLOORZ);
-    scene.addGameObject(floor);
+    //scene.addGameObject(floor);
   
     //#endregion
 
@@ -266,9 +234,19 @@ window.onload = function () {
     scene.addGameObject(cube);
 
 
-    Renderer.setClearColor(50, 50, 50);
+    const table = parseObj(join(__dirname, "assets/table.obj"));
+    scene.addGameObject(table);
+    const tmesh: Mesh = table.getComponent(Mesh) as Mesh; 
+    tmesh.triangles.forEach(tri=>tri.material = {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b:(Math.random() * 255) >> 0 });
+    tmesh.transform.scale = vec3xNumMulR(tmesh.transform.scale, 6);
+
+
+    Renderer.setClearColor(115, 78, 183);
 
     // Initialize a renderer
-    Renderer.init(scene, "app", { showfps: true });
+    Renderer.init(scene, "app", {
+        type: "VEC3",
+        object: scene.camera.transform.position
+    });
     
 };
