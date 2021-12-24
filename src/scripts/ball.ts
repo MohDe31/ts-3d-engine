@@ -1,7 +1,7 @@
 import { Component } from "../core/component";
 import GameObject from "../core/gameobject";
 import { RigidBody2D } from "../core/rigidbody";
-import { Vec2, vec2Dot, vec2Magnitude, vec2Normal, vec2xNumMulR, vec2xVec2AddR, vec2xVec2SubR } from "../utils/vecUtils";
+import { Vec2, vec2Dot, vec2Magnitude, vec2Normal, vec2Set, vec2SqrMagnitude, vec2xNumMulR, vec2xVec2AddR, vec2xVec2SubR } from "../utils/vecUtils";
 
 
 export class Ball extends Component {
@@ -25,6 +25,12 @@ export class Ball extends Component {
         this.potted = true; 
 
         this.onPot(this);
+    }
+
+    update() {
+        if(vec2SqrMagnitude(this.rigidBody.velocity) < .001){
+            this.rigidBody.velocity.x = this.rigidBody.velocity.y = 0;
+        }
     }
 
     get2DPosition(): Vec2 {
