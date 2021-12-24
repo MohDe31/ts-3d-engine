@@ -14,11 +14,16 @@ import { Renderer } from "./core/renderer";
 import { SphereVisualization } from "./scripts/sphereVisualization";
 import { parseObj } from "./utils/objParser";
 import { join } from "path";
+import { Color } from "./utils/color";
 
 
-function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function) {
+function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function, color?: Color) {
     let sphereMesh: Mesh = sphere.addComponent(Mesh) as Mesh;
     sphereMesh.triangles = sphereTriangles(4);
+
+    if(color){
+        sphereMesh.triangles.map(tri => tri.material = color);
+    }
 
     sphere.addComponent(RigidBody2D);
 
@@ -47,10 +52,10 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
 
         makeBall(sphere, 
                  ballCollisionHandler, 
-                 {x: (j * 2) - i - 4, y: i * 2 - ((floor_z >> 1) - 10)},
+                 {x: (j * 2) - i - 4, y: i * 2 - floor_z + 7},
                  (ball: Ball) => {
                      ball.gameObject.active = false;
-                 });
+                 }, {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b: (Math.random() * 255) >> 0});
 
         spheres[i * 5 + (j - i)] = sphere;
         scene.addGameObject(sphere);
@@ -61,10 +66,10 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     
     makeBall(whiteSphere,
              ballCollisionHandler,
-             {x: 0, y: (floor_z >> 2)},
+             {x: 0, y: floor_z - 7},
              (ball: Ball) => {
                  ball.transform.position.x = floor_x >> 1;
-                 ball.transform.position.z = floor_z - (floor_z >> 2);
+                 ball.transform.position.z = floor_z - 7;
                  ball.rigidBody.velocity.x = 0;
                  ball.rigidBody.velocity.y = 0;
              });
@@ -87,8 +92,8 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h1Mesh.triangles = sphereTriangles(4);
     //h1Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h1.transform.position.x = 1;
-    h1.transform.position.z = 1;
+    h1.transform.position.x = floor_x;
+    h1.transform.position.z = floor_z;
     
     h1.transform.scale.x = 1.5;
     h1.transform.scale.z = 1.5;
@@ -103,8 +108,8 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h2Mesh.triangles = sphereTriangles(4);
     //h2Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h2.transform.position.x = floor_x - 1;
-    h2.transform.position.z = floor_z - 1;
+    h2.transform.position.x = -floor_x;
+    h2.transform.position.z =  floor_z;
     
     h2.transform.scale.x = 1.5;
     h2.transform.scale.z = 1.5;
@@ -119,8 +124,8 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h3Mesh.triangles = sphereTriangles(4);
     //h3Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h3.transform.position.x = floor_x - 1;
-    h3.transform.position.z = 1;
+    h3.transform.position.x =  floor_x;
+    h3.transform.position.z = -floor_z;
     
     h3.transform.scale.x = 1.5;
     h3.transform.scale.z = 1.5;
@@ -135,8 +140,8 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h4Mesh.triangles = sphereTriangles(4);
     //h4Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h4.transform.position.x = 1;
-    h4.transform.position.z = floor_z - 1;
+    h4.transform.position.x = -floor_x;
+    h4.transform.position.z = -floor_z;
     
     h4.transform.scale.x = 1.5;
     h4.transform.scale.z = 1.5;
@@ -151,8 +156,8 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h5Mesh.triangles = sphereTriangles(4);
     //h5Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h5.transform.position.x = floor_x - 1;
-    h5.transform.position.z = floor_z >> 1;
+    h5.transform.position.x = -floor_x;
+    h5.transform.position.z =  floor_z >> 1;
     
     h5.transform.scale.x = 1.5;
     h5.transform.scale.z = 1.5;
@@ -167,7 +172,7 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h6Mesh.triangles = sphereTriangles(4);
     //h6Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h6.transform.position.x = 1;
+    h6.transform.position.x = floor_x;
     h6.transform.position.z = floor_z >> 1;
     
     h6.transform.scale.x = 1.5;
@@ -190,7 +195,7 @@ window.onload = function () {
 
     // Creating a scene
     const scene : Scene = new Scene();
-    const FLOORX: number = 40;
+    const FLOORX: number = 16;
     const FLOORZ: number = FLOORX * 2;
 
     //#region Floor Creation
@@ -215,6 +220,7 @@ window.onload = function () {
 
     // Creating a light for the scene
     scene.lights.push(new Light(1, {x: 0,y: 1, z: 0}, {x: Math.PI / 5, y: 0, z: 0}));//{x: Math.PI / 2, y: 0, z: 0}));
+    scene.lights.push(new Light(1, {x: 0,y: 1, z: 0}, {x: Math.PI, y: 0, z: 0}));//{x: Math.PI / 2, y: 0, z: 0}));
 
 
 
@@ -237,8 +243,8 @@ window.onload = function () {
     const table = parseObj(join(__dirname, "assets/table.obj"));
     scene.addGameObject(table);
     const tmesh: Mesh = table.getComponent(Mesh) as Mesh; 
-    tmesh.triangles.forEach(tri=>tri.material = {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b:(Math.random() * 255) >> 0 });
-    tmesh.transform.scale = vec3xNumMulR(tmesh.transform.scale, 6);
+    //tmesh.triangles.forEach(tri=>tri.material = {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b:(Math.random() * 255) >> 0 });
+    tmesh.transform.scale = vec3xNumMulR(tmesh.transform.scale, 4.5);
 
 
     Renderer.setClearColor(115, 78, 183);

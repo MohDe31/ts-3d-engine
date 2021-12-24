@@ -40,16 +40,16 @@ export class BallCollisionHandler extends Component {
             const next_x: number = this.balls[i].transform.position.x + this.balls[i].rigidBody.velocity.x;
             const next_y: number = this.balls[i].transform.position.z + this.balls[i].rigidBody.velocity.y;
 
-            if (next_x + this.balls[i].radius > 22){
+            if (next_x + this.balls[i].radius > 16){
                 this.balls[i].rigidBody.velocity.x *= -1;
-            }else if (next_x < -21){
+            }else if (next_x < -15){
                 this.balls[i].rigidBody.velocity.x *= -1;
             }
 
 
-            if (next_y + this.balls[i].radius > 45){
+            if (next_y + this.balls[i].radius > 34){
                 this.balls[i].rigidBody.velocity.y *= -1;
-            }else if (next_y < -45){
+            }else if (next_y < -33){
                 this.balls[i].rigidBody.velocity.y *= -1;
             }
         }

@@ -62,6 +62,7 @@ export namespace Renderer {
             Renderer.others["debug-console"].appendChild(Renderer.others[i]);
         };
 
+        Renderer.canvas.requestPointerLock();
 
         // @ts-ignore
         Renderer.gl = Renderer.canvas.getContext("webgl");
@@ -95,7 +96,10 @@ export namespace Renderer {
         document.onmouseup = function (e: MouseEvent) {
             Mouse.KeyHandler(e);
         };
-
+        
+        document.onmousemove = function (e: MouseEvent) {
+            Mouse.PositionHandler(e);
+        };
         // -------------------------------------------------
 
         /**
