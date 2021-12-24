@@ -27,6 +27,11 @@ export class Mouse {
         return this.mouseMovement;
     }
 
+    static clearMouseMovements(){
+        Mouse.mouseMovement.x = 0;
+        Mouse.mouseMovement.y = 0;
+    }
+
     static PositionHandler(e: MouseEvent) {
         Mouse.mousePosition.x += e.movementX;
         Mouse.mousePosition.y += e.movementY;

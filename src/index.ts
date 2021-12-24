@@ -15,6 +15,7 @@ import { SphereVisualization } from "./scripts/sphereVisualization";
 import { parseObj } from "./utils/objParser";
 import { join } from "path";
 import { Color } from "./utils/color";
+import { CameraLook } from "./scripts/cameraLook";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function, color?: Color) {
@@ -207,6 +208,7 @@ window.onload = function () {
     // Creating a camera for the scene
     scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5});//,  {x: Math.PI / 5, y: 0, z: 0});
     scene.camera.addComponent(CameraMovements);
+    scene.camera.addComponent(CameraLook);
     scene.addGameObject(scene.camera);
 
 

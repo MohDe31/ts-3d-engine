@@ -186,6 +186,8 @@ export namespace Renderer {
 
         Renderer.gl.drawArrays(Renderer.gl.TRIANGLES, 0, i);
 
+        Mouse.clearMouseMovements();
+
         requestAnimationFrame(Renderer.render);
     }
 
