@@ -1,3 +1,4 @@
+import { LockStatus } from "../utils/types";
 import { Vec2 } from "../utils/vecUtils";
 
 
@@ -8,6 +9,12 @@ export class Mouse {
     private static mousePosition: Vec2 = {x: 0, y: 0};
     private static mouseMovement: Vec2 = {x: 0, y: 0};
     
+    private static _isLocked: LockStatus = { Locked: false };
+
+
+    static get isLocked(): LockStatus {
+        return this._isLocked;
+    }
 
     private static AddKey(key: number) {
         Mouse.heldKeys.set(key, undefined);
@@ -38,6 +45,11 @@ export class Mouse {
 
         Mouse.mouseMovement.x = e.movementX;
         Mouse.mouseMovement.y = e.movementY;
+    }
+
+
+    static ToggleLock() {
+        this._isLocked.Locked = !this._isLocked.Locked;
     }
 
 

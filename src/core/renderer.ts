@@ -62,8 +62,6 @@ export namespace Renderer {
             Renderer.others["debug-console"].appendChild(Renderer.others[i]);
         };
 
-        Renderer.canvas.requestPointerLock();
-
         // @ts-ignore
         Renderer.gl = Renderer.canvas.getContext("webgl");
 
@@ -79,6 +77,11 @@ export namespace Renderer {
         Renderer.colorGrid = new Float32Array(points);
 
         Renderer.setupWebGL();
+
+
+        document.onpointerlockchange = function(e: any) {
+            Mouse.ToggleLock();
+        }
 
         // ----------Initializing key listeners-------------
         document.onkeydown = function (e: KeyboardEvent) {
@@ -106,6 +109,9 @@ export namespace Renderer {
          *
          */
         
+
+        Renderer.canvas.requestPointerLock();
+
         Renderer.clearColor = rgbNormal(Renderer.clearColor);
         Renderer.gl.clearColor(Renderer.clearColor.r,
                                Renderer.clearColor.g,
@@ -121,12 +127,20 @@ export namespace Renderer {
         for(let i = 0; i < Renderer.debugContent.length; i+=1) {
             const content: DebugContent = Renderer.debugContent[i];
 
-            if(content.message) Renderer.others[i].innerText = `${content.message}: `;
-            else Renderer.others[i].innerText = "";
+            let textValue: string = '';
+
+            if(content.message) textValue = `${content.message}: `;
         
             switch(content.type){
-                case "VEC3":
-                    Renderer.others[i].innerText += `${content.object.x.toFixed(2)} ${content.object.y.toFixed(2)} ${content.object.z.toFixed(2)}`;
+                case "OBJECT":
+                    Object.values(content.object).forEach((value) => {
+                        if(typeof value === "number"){
+                            textValue += `${value.toFixed(2)} `;
+                        }else{
+                            textValue += `${value} `;
+                        }
+                    });
+                    Renderer.others[i].innerText = textValue;
                     break;
             }
         }

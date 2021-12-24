@@ -11,7 +11,7 @@ declare interface CameraProjectionSettings {
 }
 
 declare interface DebugContent {
-    type: "VEC3",
+    type: "OBJECT",
     message?: string,
     object: any
 }

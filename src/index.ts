@@ -16,6 +16,7 @@ import { parseObj } from "./utils/objParser";
 import { join } from "path";
 import { Color } from "./utils/color";
 import { CameraLook } from "./scripts/cameraLook";
+import { Mouse } from "./core/mouse";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function, color?: Color) {
@@ -253,8 +254,12 @@ window.onload = function () {
 
     // Initialize a renderer
     Renderer.init(scene, "app", {
-        type: "VEC3",
+        type: "OBJECT",
         object: scene.camera.transform.position
+    }, {
+        type: "OBJECT",
+        object: Mouse.isLocked,
+        message: 'Mouse Locked'
     });
     
 };
