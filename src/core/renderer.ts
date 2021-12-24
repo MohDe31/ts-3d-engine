@@ -85,6 +85,15 @@ export namespace Renderer {
 
         // ----------Initializing key listeners-------------
         document.onkeydown = function (e: KeyboardEvent) {
+            if(e.key === 'F3'){
+                const display = Renderer.others["debug-console"].style.display;
+                if(display === 'none'){
+                    Renderer.others["debug-console"].style.display = 'block';
+                }else{
+                    Renderer.others["debug-console"].style.display = 'none';
+                }
+            }
+
             Keyboard.KeyHandler(e);
         };
 
@@ -199,6 +208,10 @@ export namespace Renderer {
         Renderer.updateBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorBuffer, new Float32Array(colors_array));
 
         Renderer.gl.drawArrays(Renderer.gl.TRIANGLES, 0, i);
+
+        if(!Mouse.isLocked.Locked && Mouse.GetKeyDown(0)){
+            Renderer.canvas.requestPointerLock();
+        }
 
         Mouse.clearMouseMovements();
 
