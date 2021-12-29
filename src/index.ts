@@ -81,10 +81,12 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     const cue: Cue = gameManager.addComponent(Cue) as Cue;
     cue.camera = camera.transform;
 
+    cue.mainCamera = camera;
     cue.whiteBall = ballCollisionHandler.balls[ballCollisionHandler.balls.length - 1].transform;
     cue.whiteBallRigid = ballCollisionHandler.balls[ballCollisionHandler.balls.length - 1].rigidBody;
+    cue.balls = spheres.map(sphere => sphere.getComponent(RigidBody2D) as RigidBody2D);
 
-    makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
+    // makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
 }
 
 function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, floor_x: number, floor_z: number) {
@@ -207,7 +209,10 @@ window.onload = function () {
     //#endregion
 
     // Creating a camera for the scene
-    scene.camera = new Camera(scene, {x: ((FLOORX / 2) >> 0),y: 7,z: ((FLOORZ / 2) >> 0) - 4.5});//,  {x: Math.PI / 5, y: 0, z: 0});
+    scene.camera = new Camera(scene, {
+        x: ((FLOORX / 2) >> 0),
+        y: 7,
+        z: ((FLOORZ / 2) >> 0) - 4.5});//,  {x: Math.PI / 5, y: 0, z: 0});
     scene.camera.addComponent(CameraMovements);
     scene.camera.addComponent(CameraLook);
     scene.addGameObject(scene.camera);
@@ -258,7 +263,7 @@ window.onload = function () {
         object: scene.camera.transform.position
     }, {
         type: "OBJECT",
-        object: Mouse.isLocked,
+        object: Mouse.lockStatus,
         message: 'Mouse Locked'
     });
     

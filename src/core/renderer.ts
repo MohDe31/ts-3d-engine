@@ -93,7 +93,6 @@ export namespace Renderer {
                     Renderer.others["debug-console"].style.display = 'none';
                 }
             }
-
             Keyboard.KeyHandler(e);
         };
 
@@ -209,11 +208,12 @@ export namespace Renderer {
 
         Renderer.gl.drawArrays(Renderer.gl.TRIANGLES, 0, i);
 
-        if(!Mouse.isLocked.Locked && Mouse.GetKeyDown(0)){
+        if(!Mouse.lockStatus.Locked && Mouse.GetKey(0)){
             Renderer.canvas.requestPointerLock();
         }
 
         Mouse.clearMouseMovements();
+        Mouse.clearMouseEvents();
 
         requestAnimationFrame(Renderer.render);
     }

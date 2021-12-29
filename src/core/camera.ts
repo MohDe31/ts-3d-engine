@@ -25,5 +25,4 @@ export class Camera extends GameObject {
             y: this.scene.world.HEIGHT >> 1
         };    
     }
-
 }

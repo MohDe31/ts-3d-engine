@@ -5,6 +5,7 @@ import { Vec2 } from "../utils/vecUtils";
 // A static class to get, store, remove mouse clicks
 export class Mouse {
     private static heldKeys: Map<number, undefined> = new Map<number, undefined>();
+    private static downKeys: Map<number, undefined> = new Map<number, undefined>();
 
     private static mousePosition: Vec2 = {x: 0, y: 0};
     private static mouseMovement: Vec2 = {x: 0, y: 0};
@@ -12,12 +13,13 @@ export class Mouse {
     private static _isLocked: LockStatus = { Locked: false };
 
 
-    static get isLocked(): LockStatus {
+    static get lockStatus(): LockStatus {
         return this._isLocked;
     }
 
     private static AddKey(key: number) {
         Mouse.heldKeys.set(key, undefined);
+        Mouse.downKeys.set(key, undefined);
         
     }
 
@@ -26,8 +28,12 @@ export class Mouse {
     }
 
 
-    static GetKeyDown(key: number): boolean {
+    static GetKey(key: number): boolean {
         return Mouse.heldKeys.has(key);
+    }
+
+    static GetKeyDown(key: number): boolean {
+        return Mouse.downKeys.has(key);
     }
 
     static GetMouseMovements(): Vec2 {
@@ -37,6 +43,10 @@ export class Mouse {
     static clearMouseMovements(){
         Mouse.mouseMovement.x = 0;
         Mouse.mouseMovement.y = 0;
+    }
+
+    static clearMouseEvents(){
+        Mouse.downKeys.clear();
     }
 
     static PositionHandler(e: MouseEvent) {

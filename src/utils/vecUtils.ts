@@ -1,8 +1,4 @@
 // Vector calculations and utilities
-
-import { Triangle } from "../core/triangle";
-
-
 export type Vec2 = {
     x: number,
     y: number

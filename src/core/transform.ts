@@ -34,6 +34,13 @@ export class Transform extends Component {
         vec3Set(this.position, vec3xVec3AddR(point, afrot_));
     }
 
+    rotateAroundMan(point: Vec3, mvx: number, mvy: number) {
+        let rot_: Vec3 = vec3xVec3SubR(this.position, point);
+        let afrot_: Vec3 = rotate(rot_, {x: mvy, y: mvx, z: 0});
+        
+        vec3Set(this.position, vec3xVec3AddR(point, afrot_));
+    }
+
 
     // Look at function based on the tan
     lookAt(point: Vec3) {
