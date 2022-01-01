@@ -56,12 +56,14 @@ export class BallCollisionHandler extends Component {
     }
         
     checkHoleCollision() {
+        const sqrRadius: number = (1.5 + this.balls[0].radius) * (1.5 + this.balls[0].radius)
         for(let i = 0; i < this.balls.length; i+=1) {
             const ballPosition: Vec2 = {x: this.balls[i].transform.position.x, y: this.balls[i].transform.position.z};
 
             for(let j = 0; j < this.holes.length; j+=1){
                 const holePosition: Vec2 = {x: this.holes[j].position.x, y: this.holes[j].position.z};
-                if(vec2SqrMagnitude(vec2xVec2SubR(ballPosition, holePosition)) < this.balls[i].radius * 1.5){
+                
+                if(vec2SqrMagnitude(vec2xVec2SubR(ballPosition, holePosition)) < sqrRadius){
                     this.balls[i].pot();
                 }
             }

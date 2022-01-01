@@ -11,14 +11,13 @@ export class CameraMovements extends Component {
     update() {
         // Calculate the inverse cos, sin of the camera to avoid recalculating them for every triangle
         this.gameObject.transform.calculateInverseCs();
-
-
+       
         // Get the held keys
         const keysIter = Keyboard.heldKeys.keys();
         
         while(true) {
             const {value, done} = keysIter.next();
-
+            
             if(done) break;
             
             // Some Key functions

@@ -70,10 +70,11 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
              ballCollisionHandler,
              {x: 0, y: floor_z - 7},
              (ball: Ball) => {
-                 ball.transform.position.x = floor_x >> 1;
-                 ball.transform.position.z = floor_z - 7;
-                 ball.rigidBody.velocity.x = 0;
-                 ball.rigidBody.velocity.y = 0;
+                ball.rigidBody.velocity.x = 0;
+                ball.rigidBody.velocity.y = 0;
+
+                ball.transform.position.x = 0;
+                ball.transform.position.z = floor_z - 7;
              });
     
     scene.addGameObject(whiteSphere);
@@ -86,7 +87,8 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     cue.whiteBallRigid = ballCollisionHandler.balls[ballCollisionHandler.balls.length - 1].rigidBody;
     cue.balls = spheres.map(sphere => sphere.getComponent(RigidBody2D) as RigidBody2D);
 
-    // makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
+    makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
+    return ballCollisionHandler;
 }
 
 function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, floor_x: number, floor_z: number) {
@@ -96,14 +98,15 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h1Mesh.triangles = sphereTriangles(4);
     //h1Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h1.transform.position.x = floor_x;
-    h1.transform.position.z = floor_z;
+    h1.transform.position.x = floor_x - .5;
+    h1.transform.position.z = floor_z + 1.5;
+    h1.transform.position.y = 1.0;
     
     h1.transform.scale.x = 1.5;
+    h1.transform.scale.y = 1.5;
     h1.transform.scale.z = 1.5;
-    h1.transform.scale.y = 0.1;
 
-    scene.addGameObject(h1);
+    // scene.addGameObject(h1);
 
     //------------------------------
     const h2: GameObject = new GameObject();
@@ -112,14 +115,15 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h2Mesh.triangles = sphereTriangles(4);
     //h2Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h2.transform.position.x = -floor_x;
-    h2.transform.position.z =  floor_z;
+    h2.transform.position.x = -floor_x + .5;
+    h2.transform.position.z = floor_z + 1.5;
+    h2.transform.position.y = 1.0;
     
     h2.transform.scale.x = 1.5;
+    h2.transform.scale.y = 1.5;
     h2.transform.scale.z = 1.5;
-    h2.transform.scale.y = 0.1;
 
-    scene.addGameObject(h2);
+    // scene.addGameObject(h2);
     
     //------------------------------
     const h3: GameObject = new GameObject();
@@ -128,14 +132,15 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h3Mesh.triangles = sphereTriangles(4);
     //h3Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h3.transform.position.x =  floor_x;
-    h3.transform.position.z = -floor_z;
+    h3.transform.position.x = -floor_x + .5;
+    h3.transform.position.z = -floor_z - 1.5;
+    h3.transform.position.y = 1.0;
     
     h3.transform.scale.x = 1.5;
+    h3.transform.scale.y = 1.5;
     h3.transform.scale.z = 1.5;
-    h3.transform.scale.y = 0.1;
 
-    scene.addGameObject(h3);
+    // scene.addGameObject(h3);
     
     //------------------------------
     const h4: GameObject = new GameObject();
@@ -144,14 +149,15 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h4Mesh.triangles = sphereTriangles(4);
     //h4Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h4.transform.position.x = -floor_x;
-    h4.transform.position.z = -floor_z;
+    h4.transform.position.x = floor_x - .5;
+    h4.transform.position.z = -floor_z - 1.5;
+    h4.transform.position.y = 1.0;
     
     h4.transform.scale.x = 1.5;
+    h4.transform.scale.y = 1.5;
     h4.transform.scale.z = 1.5;
-    h4.transform.scale.y = 0.1;
 
-    scene.addGameObject(h4);
+    // scene.addGameObject(h4);
 
     //------------------------------
     const h5: GameObject = new GameObject();
@@ -160,14 +166,15 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h5Mesh.triangles = sphereTriangles(4);
     //h5Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h5.transform.position.x = -floor_x;
-    h5.transform.position.z =  floor_z >> 1;
+    h5.transform.position.x = floor_x - .5;
+    h5.transform.position.z = 0;
+    h5.transform.position.y = 1.0;
     
     h5.transform.scale.x = 1.5;
+    h5.transform.scale.y = 1.5;
     h5.transform.scale.z = 1.5;
-    h5.transform.scale.y = 0.1;
 
-    scene.addGameObject(h5);
+    // scene.addGameObject(h5);
     
     //------------------------------
     const h6: GameObject = new GameObject();
@@ -176,14 +183,15 @@ function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, f
     h6Mesh.triangles = sphereTriangles(4);
     //h6Mesh.triangles.forEach(tri => tri.material = {r: 0, g: 0, b: 0});
     
-    h6.transform.position.x = floor_x;
-    h6.transform.position.z = floor_z >> 1;
+    h6.transform.position.x = -floor_x + .5;
+    h6.transform.position.z = 0;
+    h6.transform.position.y = 1.0;
     
     h6.transform.scale.x = 1.5;
+    h6.transform.scale.y = 1.5;
     h6.transform.scale.z = 1.5;
-    h6.transform.scale.y = 0.1;
 
-    scene.addGameObject(h6);
+    // scene.addGameObject(h6);
 
 
     ballCollisionHandler.holes.push(h1.transform,
@@ -223,7 +231,7 @@ window.onload = function () {
 
 
     //Making spheres
-    initializeBalls(scene, scene.camera, FLOORX, FLOORZ);
+    const ballCollisionHandler = initializeBalls(scene, scene.camera, FLOORX, FLOORZ);
 
 
     // Creating a light for the scene
@@ -265,6 +273,10 @@ window.onload = function () {
         type: "OBJECT",
         object: Mouse.lockStatus,
         message: 'Mouse Locked'
+    }, {
+        type: "FUNCTION",
+        object: ()=> ballCollisionHandler.balls.filter((ball) => ball.potted).length,
+        message: 'Balls potted'
     });
     
 };

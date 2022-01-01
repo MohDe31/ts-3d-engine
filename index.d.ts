@@ -11,7 +11,7 @@ declare interface CameraProjectionSettings {
 }
 
 declare interface DebugContent {
-    type: "OBJECT",
+    type: "OBJECT" | "FUNCTION",
     message?: string,
     object: any
 }

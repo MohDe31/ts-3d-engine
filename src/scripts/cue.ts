@@ -40,8 +40,7 @@ export class Cue extends Component {
 
         const dir: Vec3 = vec3Normal(vec3xVec3SubR(this.whiteBall.position, this.camera.position));
 
-        const ballsHaveStopped: boolean = vec2SqrMagnitude(this.whiteBallRigid.velocity) + this.balls.map(rigid => vec2SqrMagnitude(rigid.velocity)).reduce((a, b) => a + b) == 0;
-        
+        const ballsHaveStopped: boolean = vec2SqrMagnitude(this.whiteBallRigid.velocity) + this.balls.map(rigid => vec2SqrMagnitude(rigid.velocity) * Number(rigid.gameObject.active)).reduce((a, b) => a + b) == 0;    
 
         if(Mouse.GetKeyDown(2) && Mouse.lockStatus.Locked){
             // Remove control from player

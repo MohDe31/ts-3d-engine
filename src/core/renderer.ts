@@ -150,6 +150,9 @@ export namespace Renderer {
                     });
                     Renderer.others[i].innerText = textValue;
                     break;
+                case "FUNCTION":
+                    Renderer.others[i].innerText = textValue + `${content.object()}`;
+                    break;
             }
         }
         
@@ -182,6 +185,8 @@ export namespace Renderer {
         const triangles: Array<Triangle> = new Array<Triangle>();
 
         Renderer.scene.meshes.forEach(function(mesh: Mesh){
+            if(!mesh.gameObject.active)return;
+
             mesh.updateTriangles(Renderer.scene.camera);
 
             triangles.push(...mesh.triangles.filter(function(triangle: Triangle){

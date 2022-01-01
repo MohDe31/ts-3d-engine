@@ -42,7 +42,7 @@ export default class Scene {
     update() {
 
         this.gameObjects.forEach(gameObject => {
-            gameObject.update();
+            if(gameObject.active) gameObject.update();
         });
         
         // Rotate around the table position

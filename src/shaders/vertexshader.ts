@@ -36,9 +36,9 @@ void main(void){
     vec3 camTranslatedPoint = rotate(a_position - u_camPosition, -u_camRotation);
     
 
-    if(camTranslatedPoint.z < 0.0001)
+    if(camTranslatedPoint.z < 0.0)
     {
-        camTranslatedPoint.z = 0.0001;
+        return;
     }
 
     vec2 uv = vec2(camTranslatedPoint.x / camTranslatedPoint.z, camTranslatedPoint.y / camTranslatedPoint.z);
