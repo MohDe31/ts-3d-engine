@@ -13,6 +13,6 @@ export class CueUiManager extends Component {
     }
 
     public setPower(value: number){
-        this.powerElement.style.width = `${value}%`;
+        this.powerElement.style.width = `${100-value}%`;
     }
 }

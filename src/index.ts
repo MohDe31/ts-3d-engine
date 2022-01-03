@@ -18,6 +18,7 @@ import { Color } from "./utils/color";
 import { CameraLook } from "./scripts/cameraLook";
 import { Mouse } from "./core/mouse";
 import { CueUiManager } from "./scripts/cueUiManager";
+import { BallUiManager } from "./scripts/BallUiManager";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function, color?: Color) {
@@ -45,6 +46,7 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     const gameManager: GameObject = new GameObject();
     scene.addGameObject(gameManager);
 
+    const ballUiManager: BallUiManager = gameManager.addComponent(BallUiManager) as BallUiManager;
 
     const ballCollisionHandler: BallCollisionHandler = gameManager.addComponent(BallCollisionHandler) as BallCollisionHandler;
 
@@ -54,10 +56,13 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
         sphere.transform.position.y = 1;
 
         makeBall(sphere, 
-                 ballCollisionHandler, 
+                 ballCollisionHandler,
                  {x: (j * 2) - i - 4, y: i * 2 - floor_z + 7},
                  (ball: Ball) => {
-                     ball.gameObject.active = false;
+                    ball.gameObject.active = false;
+                    ball.transform.position.x = 500;
+
+                    ballUiManager.setPot();
                  }, {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b: (Math.random() * 255) >> 0});
 
         spheres[i * 5 + (j - i)] = sphere;
@@ -112,11 +117,11 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
 
 
 
-    makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
+    makingHoles(ballCollisionHandler, floor_x, floor_z);
     return ballCollisionHandler;
 }
 
-function makingHoles(scene: Scene, ballCollisionHandler: BallCollisionHandler, floor_x: number, floor_z: number) {
+function makingHoles(ballCollisionHandler: BallCollisionHandler, floor_x: number, floor_z: number) {
     const h1: GameObject = new GameObject();
     const h1Mesh: Mesh = h1.addComponent(Mesh) as Mesh;
 
@@ -278,7 +283,7 @@ window.onload = function () {
     
     cube.addComponent(SphereVisualization);
 
-    scene.addGameObject(cube);
+    // scene.addGameObject(cube);
 
 
     const table = parseObj(join(__dirname, "assets/table.obj"));
