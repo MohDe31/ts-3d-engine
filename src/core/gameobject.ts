@@ -24,6 +24,7 @@ export default class GameObject {
 
         this.active = true;
     }
+
     update(){
         // TODO: Change this to a for loop
         this.components.forEach(comp => { 

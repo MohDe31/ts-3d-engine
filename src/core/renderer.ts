@@ -185,7 +185,7 @@ export namespace Renderer {
         const triangles: Array<Triangle> = new Array<Triangle>();
 
         Renderer.scene.meshes.forEach(function(mesh: Mesh){
-            if(!mesh.gameObject.active)return;
+            if(!mesh.gameObject.active || !mesh.enabled)return;
 
             mesh.updateTriangles(Renderer.scene.camera);
 

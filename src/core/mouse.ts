@@ -6,6 +6,7 @@ import { Vec2 } from "../utils/vecUtils";
 export class Mouse {
     private static heldKeys: Map<number, undefined> = new Map<number, undefined>();
     private static downKeys: Map<number, undefined> = new Map<number, undefined>();
+    private static upKeys: Map<number, undefined> = new Map<number, undefined>();
 
     private static mousePosition: Vec2 = {x: 0, y: 0};
     private static mouseMovement: Vec2 = {x: 0, y: 0};
@@ -25,6 +26,7 @@ export class Mouse {
 
     private static RemoveKey(key: number) {
         Mouse.heldKeys.delete(key);
+        Mouse.upKeys.set(key, undefined);
     }
 
 
@@ -34,6 +36,10 @@ export class Mouse {
 
     static GetKeyDown(key: number): boolean {
         return Mouse.downKeys.has(key);
+    }
+
+    static GetKeyUp(key: number): boolean {
+        return Mouse.upKeys.has(key);
     }
 
     static GetMouseMovements(): Vec2 {
@@ -47,6 +53,7 @@ export class Mouse {
 
     static clearMouseEvents(){
         Mouse.downKeys.clear();
+        Mouse.upKeys.clear();
     }
 
     static PositionHandler(e: MouseEvent) {

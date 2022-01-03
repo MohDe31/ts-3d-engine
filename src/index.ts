@@ -17,6 +17,7 @@ import { join } from "path";
 import { Color } from "./utils/color";
 import { CameraLook } from "./scripts/cameraLook";
 import { Mouse } from "./core/mouse";
+import { CueUiManager } from "./scripts/cueUiManager";
 
 
 function makeBall(sphere: GameObject, ballCollisionHandler: BallCollisionHandler, position: Vec2, onPot: Function, color?: Color) {
@@ -79,7 +80,18 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     
     scene.addGameObject(whiteSphere);
 
-    const cue: Cue = gameManager.addComponent(Cue) as Cue;
+    
+    const cueObject: GameObject = parseObj(join(__dirname, "assets/cue.obj"));
+ 
+    cueObject.transform.scale.x = 5;
+    cueObject.transform.scale.y = 5;
+    cueObject.transform.scale.z = 5;
+
+    scene.addGameObject(cueObject);
+
+    cueObject.addComponent(CueUiManager);
+
+    const cue: Cue = cueObject.addComponent(Cue) as Cue;
     cue.camera = camera.transform;
 
     cue.mainCamera = camera;
@@ -259,7 +271,7 @@ window.onload = function () {
     const table = parseObj(join(__dirname, "assets/table.obj"));
     scene.addGameObject(table);
     const tmesh: Mesh = table.getComponent(Mesh) as Mesh; 
-    //tmesh.triangles.forEach(tri=>tri.material = {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b:(Math.random() * 255) >> 0 });
+    // tmesh.triangles.forEach(tri=>tri.material = {r: (Math.random() * 255) >> 0, g: (Math.random() * 255) >> 0, b:(Math.random() * 255) >> 0 });
     tmesh.transform.scale = vec3xNumMulR(tmesh.transform.scale, 4.5);
 
 
@@ -278,5 +290,5 @@ window.onload = function () {
         object: ()=> ballCollisionHandler.balls.filter((ball) => ball.potted).length,
         message: 'Balls potted'
     });
-    
+
 };

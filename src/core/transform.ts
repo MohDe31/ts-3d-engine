@@ -41,6 +41,25 @@ export class Transform extends Component {
         vec3Set(this.position, vec3xVec3AddR(point, afrot_));
     }
 
+    lookAtY(point: Vec3){
+        const reqVec = vec3xVec3SubR(point, this.position);
+
+
+        // I had a bug where the camera would look down at some point so
+        // after debugging i came up with this, its not smooth but it works
+        // and i don't know why
+        const x: number  = Math.abs(reqVec.x);
+        const z: number  = Math.abs(reqVec.z);
+        
+        const xz: number = Math.max(x, z);
+        // -----------------------------------------------------------------
+
+
+        const rotX: number = Math.atan2(reqVec.y, xz);
+        const rotY: number = Math.atan2(reqVec.x, reqVec.z);
+    
+        vec3Set(this.rotation, {x: 0, y: rotY, z: 0});
+    }
 
     // Look at function based on the tan
     lookAt(point: Vec3) {
