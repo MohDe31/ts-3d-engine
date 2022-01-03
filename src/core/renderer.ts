@@ -201,7 +201,7 @@ export namespace Renderer {
             rgb_normal = rgbNormal(triangle.material);
             triangle.cameraPoints.forEach(pt => {
                 ++i;
-                colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b);
+                colors_array.push(rgb_normal.r, rgb_normal.g, rgb_normal.b, rgb_normal.a === undefined ? 1.0 : rgb_normal.a);
                 normal_array.push(triangle.normal.x, triangle.normal.y, triangle.normal.z);
                 points_array.push(pt.x, pt.y, pt.z);
             })
@@ -294,7 +294,7 @@ export namespace Renderer {
             // TODO: DYNAMIC_DRAW
             Renderer.vertexBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.vertexGrid, Renderer.gl.STATIC_DRAW, "a_position", 3, Renderer.gl.FLOAT);
             Renderer.normalBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.normalGrid, Renderer.gl.STATIC_DRAW, "a_normal", 3, Renderer.gl.FLOAT);
-            Renderer.colorBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorGrid, Renderer.gl.STATIC_DRAW, "a_color", 3, Renderer.gl.FLOAT);
+            Renderer.colorBuffer = Renderer.createBuffer(Renderer.gl.ARRAY_BUFFER, Renderer.colorGrid, Renderer.gl.STATIC_DRAW, "a_color", 4, Renderer.gl.FLOAT);
 
             Renderer.camPositionUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_camPosition");
             Renderer.camRotationUniformLocation = Renderer.gl.getUniformLocation(Renderer.webglProgram, "u_camRotation");

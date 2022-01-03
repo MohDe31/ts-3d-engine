@@ -1,7 +1,8 @@
 export type Color = {
-    r: number,
-    g: number,
-    b: number
+    r:  number,
+    g:  number,
+    b:  number,
+    a?: number
 }
 
 export type HSVColor = {
@@ -12,7 +13,7 @@ export type HSVColor = {
 
 
 export function rgbToString(color: Color): string {
-    return `rgb(${color.r}, ${color.g}, ${color.b})`;
+    return `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
 }
 
 
@@ -21,6 +22,7 @@ export function rgbNormal(color: Color): Color {
         r: color.r / 255,
         g: color.g / 255,
         b: color.b / 255,
+        a: color.a
     }
 }
 

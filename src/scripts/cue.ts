@@ -34,6 +34,9 @@ export class Cue extends Component {
     meshComponent: Component;
 
     cueUiManager: CueUiManager;
+
+    cueHelper: Transform;
+    cueHelperMeshComponent: Mesh;
     
 
     start(){
@@ -45,6 +48,11 @@ export class Cue extends Component {
         this.cueUiManager = this.gameObject.getComponent(CueUiManager) as CueUiManager;
 
         this.meshComponent = this.gameObject.getComponent(Mesh) as Mesh;
+        this.cueHelperMeshComponent = this.cueHelper.gameObject.getComponent(Mesh) as Mesh;
+
+        this.cueHelperMeshComponent.triangles.forEach(tri => {
+            tri.material.a = .01;
+        })
     }
 
     update(){
@@ -55,6 +63,8 @@ export class Cue extends Component {
         }
 
         this.transform.lookAtY(this.camera.position);
+        this.cueHelper.lookAtY(this.camera.position);
+        this.cueHelper.rotation.y += Math.PI;
 
         const dir: Vec3 = vec3Normal(vec3xVec3SubR(this.whiteBall.position, this.camera.position));
 
@@ -64,7 +74,7 @@ export class Cue extends Component {
             // Remove control from player
             if(!this.onFocus){
                 this.onFocus = true;
-                this.cameraMovements.enabled = false;
+                // this.cameraMovements.enabled = false;
                 // Look at the ball
                 this.camera.lookAt(this.whiteBall.position);
                 // Zoom in
@@ -87,8 +97,11 @@ export class Cue extends Component {
 
             if(!this.meshComponent.enabled){
                 this.meshComponent.enabled = true
+                this.cueHelperMeshComponent.enabled = true
             }
 
+
+            vec3Set(this.cueHelper.position, this.whiteBall.position);
 
             vec3Set(this.transform.position, this.whiteBall.position);
             vec3xVec3Sub(this.transform.position, vec3xNumMulR(dir, (this.currentForce - MIN_FORCE) / 10));
@@ -115,6 +128,8 @@ export class Cue extends Component {
             }
         }else if (this.meshComponent.enabled){
             this.meshComponent.enabled = false;
+            this.cueHelperMeshComponent.enabled = false;
+            //this.cueHelperMeshComponent.enabled = false;
         }
     }
 }

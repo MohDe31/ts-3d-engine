@@ -6,7 +6,8 @@ const int MAX_ITERATIONS = 6;
 
 attribute vec3 a_position;
 attribute vec3 a_normal;
-attribute vec3 a_color;
+
+attribute vec4 a_color;
 
 uniform vec2 u_size;
 uniform vec3 u_camPosition;
@@ -16,7 +17,7 @@ uniform vec3 u_lights[6];
 uniform int u_lightsCount;
 uniform float u_f;
 
-varying vec3 v_color;
+varying vec4 v_color;
 
 vec3 rotate(vec3 point, vec3 rotation)
 {
@@ -63,7 +64,7 @@ void main(void){
 
     gl_Position = vec4(((u_f * uv + (u_size / 2.0)) / u_size) * 2.0 - 1.0,  1.0, 1.0);
     
-    v_color = a_color * intensity;
+    v_color = vec4(a_color.rgb * intensity, a_color.a);
 }
 
 `;

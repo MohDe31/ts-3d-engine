@@ -99,6 +99,19 @@ function initializeBalls(scene: Scene, camera: Camera, floor_x: number, floor_z:
     cue.whiteBallRigid = ballCollisionHandler.balls[ballCollisionHandler.balls.length - 1].rigidBody;
     cue.balls = spheres.map(sphere => sphere.getComponent(RigidBody2D) as RigidBody2D);
 
+    const cueHelper: GameObject = parseObj(join(__dirname, "assets/cue.obj"));
+ 
+    cueHelper.transform.scale.x = 5;
+    cueHelper.transform.scale.y = 5;
+    cueHelper.transform.scale.z = 5;
+
+    scene.addGameObject(cueHelper);
+
+    cue.cueHelper = cueHelper.transform;
+
+
+
+
     makingHoles(scene, ballCollisionHandler, floor_x, floor_z);
     return ballCollisionHandler;
 }
